@@ -66,7 +66,8 @@ class TestDataLoader:
 
     def test_cache_functionality(self, loader, tmp_path):
         """Test data caching."""
-        # Create dummy DataFrame
+        # Create dummy DataFrame with DatetimeIndex (like real market data)
+        dates = pd.date_range("2020-01-01", periods=3, freq="D")
         df = pd.DataFrame(
             {
                 "open": [100, 101, 102],
@@ -74,7 +75,8 @@ class TestDataLoader:
                 "low": [99, 100, 101],
                 "close": [100.5, 101.5, 102.5],
                 "volume": [1000, 1100, 1200],
-            }
+            },
+            index=dates
         )
 
         # Save to cache
@@ -83,6 +85,7 @@ class TestDataLoader:
         # Load from cache
         cached_df = loader._load_from_cache("TEST", "2020-01-01", "2020-01-31")
 
-        assert cached_df is not None
+        assert cached_df is not None, f"Cache file should exist in {loader.cache_dir}"
         assert len(cached_df) == len(df)
-        pd.testing.assert_frame_equal(df, cached_df)
+        # Parquet doesn't preserve freq, so check_freq=False
+        pd.testing.assert_frame_equal(df, cached_df, check_freq=False)

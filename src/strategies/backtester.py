@@ -375,7 +375,10 @@ class Backtester:
         """
         regime_analysis = {}
 
-        for regime in regime_labels.unique():
+        # Handle both numpy arrays and pandas Series
+        unique_regimes = np.unique(regime_labels) if isinstance(regime_labels, np.ndarray) else regime_labels.unique()
+
+        for regime in unique_regimes:
             mask = regime_labels == regime
             regime_returns = returns[mask]
             regime_positions = positions[mask]

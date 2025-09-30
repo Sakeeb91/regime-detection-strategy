@@ -101,7 +101,7 @@ class TestEndToEndPipeline:
         regimes = detector.predict(regime_features)
 
         assert len(regimes) == len(regime_features)
-        assert regimes.nunique() <= 3  # May be less if states don't all appear
+        assert len(np.unique(regimes)) <= 3  # May be less if states don't all appear
 
         # Step 4: Backtest mean reversion strategy
         strategy = MeanReversionStrategy()
@@ -236,8 +236,10 @@ class TestEndToEndPipeline:
         detector2.fit(regime_features)
         regimes2 = detector2.predict(regime_features)
 
-        # Should be identical
-        pd.testing.assert_series_equal(regimes1, regimes2)
+        # Should be identical (convert numpy arrays to Series for comparison)
+        regimes1_series = pd.Series(regimes1) if isinstance(regimes1, np.ndarray) else regimes1
+        regimes2_series = pd.Series(regimes2) if isinstance(regimes2, np.ndarray) else regimes2
+        pd.testing.assert_series_equal(regimes1_series, regimes2_series)
 
 
 class TestDataIntegration:

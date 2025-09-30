@@ -168,7 +168,7 @@ class TestFeaturesToRegimesPipeline:
         assert len(np.unique(regimes)) <= 3
 
         # Check transition probabilities
-        trans_prob = detector.get_transition_probabilities()
+        trans_prob = detector.get_transition_matrix()
         assert trans_prob.shape == (3, 3)
         assert np.allclose(trans_prob.sum(axis=1), 1.0)
 
