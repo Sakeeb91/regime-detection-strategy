@@ -70,7 +70,7 @@ class TestEndToEndPipeline:
         regimes = detector.predict(regime_features)
 
         assert len(regimes) == len(regime_features)
-        assert regimes.nunique() == 3
+        assert len(np.unique(regimes)) == 3
 
         # Step 4: Run strategy backtest
         strategy = TrendFollowingStrategy()

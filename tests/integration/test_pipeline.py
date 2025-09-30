@@ -150,7 +150,7 @@ class TestFeaturesToRegimesPipeline:
         regimes = detector.predict(feature_data)
 
         assert len(regimes) == len(feature_data)
-        assert regimes.nunique() == 3
+        assert len(np.unique(regimes)) == 3
         assert regimes.min() == 0
         assert regimes.max() == 2
 
@@ -165,7 +165,7 @@ class TestFeaturesToRegimesPipeline:
         regimes = detector.predict(feature_data)
 
         assert len(regimes) == len(feature_data)
-        assert regimes.nunique() <= 3
+        assert len(np.unique(regimes)) <= 3
 
         # Check transition probabilities
         trans_prob = detector.get_transition_probabilities()
@@ -176,13 +176,13 @@ class TestFeaturesToRegimesPipeline:
         """Test DTW clustering on features."""
         detector = DTWClustering(n_clusters=3, random_state=42)
 
-        # Use returns for clustering
-        returns_series = feature_data["returns"].values.reshape(-1, 1)
+        # Use returns as pandas Series for clustering
+        returns_series = feature_data["returns"]
         detector.fit(returns_series)
         labels = detector.predict(returns_series)
 
         assert len(labels) == len(feature_data)
-        assert labels.nunique() <= 3
+        assert len(np.unique(labels)) <= 3
 
     def test_regime_consistency(self, feature_data):
         """Test that detected regimes are consistent."""
@@ -191,7 +191,9 @@ class TestFeaturesToRegimesPipeline:
         regimes = detector.predict(feature_data)
 
         # Calculate regime persistence (average duration)
-        regime_changes = (regimes.diff() != 0).sum()
+        # Convert to pandas Series for diff operation
+        regimes_series = pd.Series(regimes)
+        regime_changes = (regimes_series.diff() != 0).sum()
         avg_duration = (
             len(regimes) / regime_changes if regime_changes > 0 else len(regimes)
         )
@@ -240,9 +242,9 @@ class TestRegimesToStrategiesPipeline:
 
         # Get strategy for each regime
         for regime in [0, 1, 2]:
-            strategy = selector.get_strategy(regime)
+            strategy = selector.select_strategy(regime)
             assert strategy is not None
-            assert isinstance(strategy, strategy_map[regime].__class__)
+            assert strategy == strategy_map[regime]
 
     def test_adaptive_signals(self, price_data_with_regimes):
         """Test generating adaptive signals based on regimes."""

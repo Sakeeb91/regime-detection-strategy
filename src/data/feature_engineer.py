@@ -96,12 +96,45 @@ class FeatureEngineer:
         if "statistical" in feature_groups:
             df = self._add_statistical_features(df)
 
-        # Drop NaN values at the beginning
+        # Handle NaN values intelligently
+        # Drop only the initial warm-up period based on max window size
         initial_rows = len(df)
+        logger.debug(f"Before NaN handling: {len(df)} rows, {len(df.columns)} columns")
+
+        # Find the maximum window size used
+        max_window = max(self.windows) if self.windows else 50
+        logger.debug(f"Max window size: {max_window}")
+
+        # Drop the first max_window rows where most features will be NaN
+        # This is more efficient than checking each row
+        df = df.iloc[max_window:]
+        logger.debug(f"After dropping first {max_window} rows: {len(df)} rows")
+
+        # Count NaNs before filling
+        nans_before = df.isna().sum().sum()
+        logger.debug(f"NaNs before filling: {nans_before}")
+
+        # Forward fill any remaining NaNs (up to 10 periods)
+        # This handles occasional missing values in indicators
+        df = df.ffill(limit=10)
+        logger.debug(f"After forward fill: {df.isna().sum().sum()} NaNs, {len(df)} rows")
+
+        # Backward fill for any remaining NaNs at the start
+        df = df.bfill(limit=5)
+        logger.debug(f"After backward fill: {df.isna().sum().sum()} NaNs, {len(df)} rows")
+
+        # Check which columns still have NaNs
+        nan_cols = df.columns[df.isna().any()].tolist()
+        if nan_cols:
+            logger.debug(f"Columns with NaNs: {nan_cols[:10]}...")  # Show first 10
+
+        # Drop any rows that still have NaNs (should be none or very few)
         df = df.dropna()
+        logger.debug(f"After final dropna: {len(df)} rows")
+
         dropped = initial_rows - len(df)
         logger.info(
-            f"Created features: {len(df.columns)} columns, dropped {dropped} rows"
+            f"Created features: {len(df.columns)} columns, {len(df)} rows remaining, dropped {dropped} rows"
         )
 
         return df
@@ -333,35 +366,36 @@ class FeatureEngineer:
             # Rolling skewness
             df[f"rolling_skew_{window}"] = (
                 df["returns"]
-                .rolling(window)
-                .apply(lambda x: skew(x) if len(x) == window else np.nan)
+                .rolling(window, min_periods=window)
+                .apply(lambda x: skew(x))
             )
 
             # Rolling kurtosis
             df[f"rolling_kurt_{window}"] = (
                 df["returns"]
-                .rolling(window)
-                .apply(lambda x: kurtosis(x) if len(x) == window else np.nan)
+                .rolling(window, min_periods=window)
+                .apply(lambda x: kurtosis(x))
             )
 
             # Rolling min and max returns
-            df[f"rolling_min_{window}"] = df["returns"].rolling(window).min()
-            df[f"rolling_max_{window}"] = df["returns"].rolling(window).max()
+            df[f"rolling_min_{window}"] = df["returns"].rolling(window, min_periods=window).min()
+            df[f"rolling_max_{window}"] = df["returns"].rolling(window, min_periods=window).max()
 
             # Return autocorrelation
             df[f"return_autocorr_{window}"] = (
                 df["returns"]
-                .rolling(window)
-                .apply(lambda x: x.autocorr() if len(x) == window else np.nan)
+                .rolling(window, min_periods=window)
+                .apply(lambda x: x.autocorr())
             )
 
         # Hurst exponent (simplified version for mean reversion detection)
-        if self.include_advanced:
-            df["hurst_50"] = (
-                df["close"]
-                .rolling(50)
-                .apply(lambda x: self._calculate_hurst(x) if len(x) == 50 else np.nan)
-            )
+        # Disabled temporarily due to calculation issues
+        # if self.include_advanced:
+        #     df["hurst_50"] = (
+        #         df["close"]
+        #         .rolling(50, min_periods=50)
+        #         .apply(lambda x: self._calculate_hurst(x))
+        #     )
 
         return df
 
