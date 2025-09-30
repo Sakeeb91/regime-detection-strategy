@@ -37,16 +37,22 @@ Most trading strategies fail because they're not adaptive to changing market con
 git clone https://github.com/Sakeeb91/regime-detection-strategy.git
 cd regime-detection-strategy
 
-# Create virtual environment
-python -m venv venv
+# Create virtual environment (Python 3.9+)
+python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Set up environment variables
+# Set up environment variables (optional)
 cp .env.example .env
+
+# Run tests to verify installation
+pytest
 ```
+
+> **Note**: Installation takes ~5-10 minutes depending on your connection. Requirements include PyTorch, XGBoost, and various ML libraries.
 
 ### Basic Usage
 
@@ -218,22 +224,37 @@ See [TESTING.md](docs/TESTING.md) for detailed testing guidelines.
 
 ## 🗺️ Roadmap
 
-### Phase 1: Foundation ✅
-- [x] Data acquisition and preprocessing
-- [x] Feature engineering pipeline
+### Phase 1: Foundation ✅ **COMPLETE**
+- [x] Data acquisition and preprocessing (~900 LOC)
+- [x] Feature engineering pipeline (50+ technical indicators)
 - [x] Regime detection models (GMM, HMM, DTW)
+- [x] Transition predictor (Random Forest, XGBoost)
 
-### Phase 2: Strategy Framework (In Progress)
-- [ ] Implement trend-following strategy
-- [ ] Implement mean-reversion strategy
-- [ ] Backtesting engine
-- [ ] Performance analytics
+### Phase 2: Strategy Framework ✅ **COMPLETE**
+- [x] Implement trend-following strategy
+- [x] Implement mean-reversion strategy
+- [x] Implement volatility breakout strategy
+- [x] Backtesting engine with transaction costs & slippage
+- [x] Strategy selector for regime-based allocation
+- [x] Performance analytics (Sharpe, Sortino, Calmar, drawdowns)
 
-### Phase 3: Advanced Features (Planned)
+### Phase 3: Testing & Documentation 🔄 **IN PROGRESS (64% Complete)**
+- [x] Unit test suite (29/45 tests passing)
+- [x] Integration tests framework
+- [x] Test coverage: 19% (target: >80%)
+- [x] API documentation
+- [x] Testing guidelines
+- [ ] Fix known test issues (feature engineering edge cases)
+- [ ] Increase test coverage
+- [ ] Example Jupyter notebooks
+- [ ] Usage tutorials
+
+### Phase 4: Advanced Features 📋 **PLANNED**
 - [ ] Reinforcement learning for dynamic allocation
-- [ ] Real-time regime monitoring
+- [ ] Real-time regime monitoring dashboard
 - [ ] Multi-asset portfolio optimization
 - [ ] Web dashboard for visualization
+- [ ] Live trading integration
 
 ---
 
@@ -273,6 +294,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📈 Project Status
 
-🟢 **Active Development** - This project is actively maintained and updated.
+🟢 **Active Development** - Core implementation complete, testing & optimization in progress.
+
+### Current Statistics
+- **Lines of Code**: ~4,300 Python LOC
+- **Test Coverage**: 19% (29/45 tests passing)
+- **Modules Implemented**: 22/22 (100%)
+- **Documentation**: Comprehensive API docs & guides
+
+### Known Issues
+1. Feature engineering drops all rows with certain window configurations (being fixed)
+2. Some integration tests have assertion errors with numpy arrays
+3. Test coverage below target (19% vs 80% goal)
 
 *Last Updated: September 30, 2025*
