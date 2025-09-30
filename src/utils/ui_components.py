@@ -122,8 +122,37 @@ def apply_professional_styling():
         }
 
         /* Slider styling with comprehensive selectors */
+
+        /* Slider track - the background bar */
         .stSlider [data-baseweb="slider"] {
-            background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%);
+            background-color: rgba(148, 163, 184, 0.2) !important;
+        }
+
+        /* Slider track inner (filled portion) */
+        .stSlider [data-baseweb="slider"] [data-baseweb="slider-track-inner"] {
+            background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%) !important;
+        }
+
+        /* Slider thumb - the draggable circle */
+        .stSlider [data-baseweb="slider"] [role="slider"] {
+            background-color: #FFFFFF !important;
+            border: 3px solid #6366F1 !important;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4) !important;
+            width: 20px !important;
+            height: 20px !important;
+        }
+
+        .stSlider [data-baseweb="slider"] [role="slider"]:hover {
+            background-color: #FFFFFF !important;
+            border-color: #8B5CF6 !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.6) !important;
+            transform: scale(1.1);
+        }
+
+        .stSlider [data-baseweb="slider"] [role="slider"]:active {
+            background-color: #FFFFFF !important;
+            border-color: #6366F1 !important;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.8) !important;
         }
 
         /* Slider labels - all variations */
