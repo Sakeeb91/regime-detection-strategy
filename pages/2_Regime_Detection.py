@@ -237,32 +237,43 @@ if run_button or 'regimes' in st.session_state:
     with tab2:
         st.subheader("Regime Statistics")
 
-        # Convert stats to DataFrame
+        # Convert stats to DataFrame - handle both dict and DataFrame
         stats_data = []
-        for regime_id, regime_stats in stats.items():
-            # Handle both dict and Series structures
-            if isinstance(regime_stats, dict):
-                mean_ret = regime_stats['mean_return']
-                vol = regime_stats['volatility']
-                sharpe = regime_stats['sharpe_ratio']
-                freq = regime_stats['frequency']
-                dur = regime_stats['avg_duration']
-            else:
-                # If it's a Series, access by attribute
-                mean_ret = regime_stats.get('mean_return', 0)
-                vol = regime_stats.get('volatility', 0)
-                sharpe = regime_stats.get('sharpe_ratio', 0)
-                freq = regime_stats.get('frequency', 0)
-                dur = regime_stats.get('avg_duration', 0)
+        if isinstance(stats, pd.DataFrame):
+            # Stats is already a DataFrame
+            for regime_id in stats.index:
+                stats_data.append({
+                    'Regime': regime_labels.get(regime_id, f"Regime {regime_id}"),
+                    'Avg Return': f"{stats.loc[regime_id, 'mean_return']*100:.3f}%",
+                    'Volatility': f"{stats.loc[regime_id, 'std_return']*100:.3f}%",
+                    'Sharpe Ratio': f"{stats.loc[regime_id, 'sharpe_ratio']:.2f}",
+                    'Frequency': f"{stats.loc[regime_id, 'frequency']*100:.1f}%",
+                    'Avg Duration': f"{stats.loc[regime_id, 'avg_duration']:.1f} days"
+                })
+        else:
+            # Stats is a dict
+            for regime_id, regime_stats in stats.items():
+                if isinstance(regime_stats, dict):
+                    mean_ret = regime_stats['mean_return']
+                    vol = regime_stats['volatility']
+                    sharpe = regime_stats['sharpe_ratio']
+                    freq = regime_stats['frequency']
+                    dur = regime_stats['avg_duration']
+                else:
+                    mean_ret = regime_stats.get('mean_return', 0)
+                    vol = regime_stats.get('volatility', 0)
+                    sharpe = regime_stats.get('sharpe_ratio', 0)
+                    freq = regime_stats.get('frequency', 0)
+                    dur = regime_stats.get('avg_duration', 0)
 
-            stats_data.append({
-                'Regime': regime_labels.get(regime_id, f"Regime {regime_id}"),
-                'Avg Return': f"{mean_ret*100:.3f}%",
-                'Volatility': f"{vol*100:.3f}%",
-                'Sharpe Ratio': f"{sharpe:.2f}",
-                'Frequency': f"{freq*100:.1f}%",
-                'Avg Duration': f"{dur:.1f} days"
-            })
+                stats_data.append({
+                    'Regime': regime_labels.get(regime_id, f"Regime {regime_id}"),
+                    'Avg Return': f"{mean_ret*100:.3f}%",
+                    'Volatility': f"{vol*100:.3f}%",
+                    'Sharpe Ratio': f"{sharpe:.2f}",
+                    'Frequency': f"{freq*100:.1f}%",
+                    'Avg Duration': f"{dur:.1f} days"
+                })
 
         stats_df = pd.DataFrame(stats_data)
         st.dataframe(stats_df, hide_index=True, use_container_width=True)
@@ -273,13 +284,22 @@ if run_button or 'regimes' in st.session_state:
         with col1:
             # Returns by regime
             fig_returns = go.Figure()
-            for regime_id, regime_stats in stats.items():
-                fig_returns.add_trace(go.Bar(
-                    x=[regime_labels.get(regime_id, f"Regime {regime_id}")],
-                    y=[regime_stats['mean_return']*100],
-                    name=regime_labels.get(regime_id, f"Regime {regime_id}"),
-                    marker_color=colors[regime_id % len(colors)].replace('0.3', '0.8')
-                ))
+            if isinstance(stats, pd.DataFrame):
+                for regime_id in stats.index:
+                    fig_returns.add_trace(go.Bar(
+                        x=[regime_labels.get(regime_id, f"Regime {regime_id}")],
+                        y=[stats.loc[regime_id, 'mean_return']*100],
+                        name=regime_labels.get(regime_id, f"Regime {regime_id}"),
+                        marker_color=colors[regime_id % len(colors)].replace('0.3', '0.8')
+                    ))
+            else:
+                for regime_id, regime_stats in stats.items():
+                    fig_returns.add_trace(go.Bar(
+                        x=[regime_labels.get(regime_id, f"Regime {regime_id}")],
+                        y=[regime_stats['mean_return']*100],
+                        name=regime_labels.get(regime_id, f"Regime {regime_id}"),
+                        marker_color=colors[regime_id % len(colors)].replace('0.3', '0.8')
+                    ))
 
             fig_returns.update_layout(
                 title="Average Returns by Regime",
@@ -292,9 +312,14 @@ if run_button or 'regimes' in st.session_state:
 
         with col2:
             # Regime frequency
+            if isinstance(stats, pd.DataFrame):
+                freq_values = [stats.loc[i, 'frequency'] for i in range(n_regimes)]
+            else:
+                freq_values = [stats[i]['frequency'] for i in range(n_regimes)]
+
             fig_freq = go.Figure(data=[go.Pie(
                 labels=[regime_labels.get(i, f"Regime {i}") for i in range(n_regimes)],
-                values=[stats[i]['frequency'] for i in range(n_regimes)],
+                values=freq_values,
                 marker=dict(colors=[colors[i % len(colors)].replace('0.3', '0.8') for i in range(n_regimes)])
             )])
 
