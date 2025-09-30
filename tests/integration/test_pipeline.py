@@ -27,20 +27,25 @@ class TestDataToFeaturesPipeline:
     @pytest.fixture
     def raw_data(self):
         """Create raw OHLCV data with some issues."""
-        dates = pd.date_range(start='2020-01-01', end='2022-12-31', freq='D')
+        dates = pd.date_range(start="2020-01-01", end="2022-12-31", freq="D")
         n = len(dates)
 
-        data = pd.DataFrame({
-            'open': np.random.randn(n).cumsum() + 100,
-            'high': np.random.randn(n).cumsum() + 102,
-            'low': np.random.randn(n).cumsum() + 98,
-            'close': np.random.randn(n).cumsum() + 100,
-            'volume': np.random.randint(100000, 1000000, n)
-        }, index=dates)
+        data = pd.DataFrame(
+            {
+                "open": np.random.randn(n).cumsum() + 100,
+                "high": np.random.randn(n).cumsum() + 102,
+                "low": np.random.randn(n).cumsum() + 98,
+                "close": np.random.randn(n).cumsum() + 100,
+                "volume": np.random.randint(100000, 1000000, n),
+            },
+            index=dates,
+        )
 
         # Introduce some issues
-        data.loc[data.index[10], 'close'] = np.nan  # Missing value
-        data.loc[data.index[50], 'high'] = data.loc[data.index[50], 'close'] * 3  # Outlier
+        data.loc[data.index[10], "close"] = np.nan  # Missing value
+        data.loc[data.index[50], "high"] = (
+            data.loc[data.index[50], "close"] * 3
+        )  # Outlier
 
         return data
 
@@ -62,8 +67,8 @@ class TestDataToFeaturesPipeline:
         assert len(features.columns) > len(clean_data.columns)
 
         # Should have returns
-        assert 'returns' in features.columns
-        assert 'log_returns' in features.columns
+        assert "returns" in features.columns
+        assert "log_returns" in features.columns
 
         # Should not have NaN in output
         assert not features.isnull().any().any()
@@ -76,7 +81,7 @@ class TestDataToFeaturesPipeline:
         engineer = FeatureEngineer()
 
         # Test individual feature groups
-        for group in ['trend', 'volatility', 'momentum', 'volume', 'statistical']:
+        for group in ["trend", "volatility", "momentum", "volume", "statistical"]:
             features = engineer.create_features(clean_data, feature_groups=[group])
             assert len(features) > 0
             assert not features.isnull().any().any()
@@ -106,27 +111,33 @@ class TestFeaturesToRegimesPipeline:
     @pytest.fixture
     def feature_data(self):
         """Create feature data for regime detection."""
-        dates = pd.date_range(start='2020-01-01', end='2022-12-31', freq='D')
+        dates = pd.date_range(start="2020-01-01", end="2022-12-31", freq="D")
         n = len(dates)
 
         # Create data with distinct regimes
-        regime_1 = pd.DataFrame({
-            'returns': np.random.randn(n // 3) * 0.005,
-            'volatility': np.random.randn(n // 3) * 0.01 + 0.01,
-            'trend_strength': np.random.randn(n // 3) * 0.1 + 0.3
-        })
+        regime_1 = pd.DataFrame(
+            {
+                "returns": np.random.randn(n // 3) * 0.005,
+                "volatility": np.random.randn(n // 3) * 0.01 + 0.01,
+                "trend_strength": np.random.randn(n // 3) * 0.1 + 0.3,
+            }
+        )
 
-        regime_2 = pd.DataFrame({
-            'returns': np.random.randn(n // 3) * 0.02,
-            'volatility': np.random.randn(n // 3) * 0.02 + 0.03,
-            'trend_strength': np.random.randn(n // 3) * 0.1 + 0.7
-        })
+        regime_2 = pd.DataFrame(
+            {
+                "returns": np.random.randn(n // 3) * 0.02,
+                "volatility": np.random.randn(n // 3) * 0.02 + 0.03,
+                "trend_strength": np.random.randn(n // 3) * 0.1 + 0.7,
+            }
+        )
 
-        regime_3 = pd.DataFrame({
-            'returns': np.random.randn(n // 3 + n % 3) * 0.001,
-            'volatility': np.random.randn(n // 3 + n % 3) * 0.005 + 0.005,
-            'trend_strength': np.random.randn(n // 3 + n % 3) * 0.1 + 0.1
-        })
+        regime_3 = pd.DataFrame(
+            {
+                "returns": np.random.randn(n // 3 + n % 3) * 0.001,
+                "volatility": np.random.randn(n // 3 + n % 3) * 0.005 + 0.005,
+                "trend_strength": np.random.randn(n // 3 + n % 3) * 0.1 + 0.1,
+            }
+        )
 
         data = pd.concat([regime_1, regime_2, regime_3], ignore_index=True)
         data.index = dates
@@ -167,7 +178,7 @@ class TestFeaturesToRegimesPipeline:
         detector = DTWClustering(n_clusters=3, random_state=42)
 
         # Use returns for clustering
-        returns_series = feature_data['returns'].values.reshape(-1, 1)
+        returns_series = feature_data["returns"].values.reshape(-1, 1)
         detector.fit(returns_series)
         labels = detector.predict(returns_series)
 
@@ -182,7 +193,9 @@ class TestFeaturesToRegimesPipeline:
 
         # Calculate regime persistence (average duration)
         regime_changes = (regimes.diff() != 0).sum()
-        avg_duration = len(regimes) / regime_changes if regime_changes > 0 else len(regimes)
+        avg_duration = (
+            len(regimes) / regime_changes if regime_changes > 0 else len(regimes)
+        )
 
         # Regimes should persist for multiple periods
         assert avg_duration > 1
@@ -194,16 +207,19 @@ class TestRegimesToStrategiesPipeline:
     @pytest.fixture
     def price_data_with_regimes(self):
         """Create price data with regime labels."""
-        dates = pd.date_range(start='2020-01-01', end='2022-12-31', freq='D')
+        dates = pd.date_range(start="2020-01-01", end="2022-12-31", freq="D")
         n = len(dates)
 
-        data = pd.DataFrame({
-            'open': np.random.randn(n).cumsum() + 100,
-            'high': np.random.randn(n).cumsum() + 102,
-            'low': np.random.randn(n).cumsum() + 98,
-            'close': np.random.randn(n).cumsum() + 100,
-            'volume': np.random.randint(100000, 1000000, n)
-        }, index=dates)
+        data = pd.DataFrame(
+            {
+                "open": np.random.randn(n).cumsum() + 100,
+                "high": np.random.randn(n).cumsum() + 102,
+                "low": np.random.randn(n).cumsum() + 98,
+                "close": np.random.randn(n).cumsum() + 100,
+                "volume": np.random.randint(100000, 1000000, n),
+            },
+            index=dates,
+        )
 
         # Create regime labels (0, 1, 2)
         regimes = pd.Series(np.random.choice([0, 1, 2], size=n), index=dates)
@@ -218,7 +234,7 @@ class TestRegimesToStrategiesPipeline:
         strategy_map = {
             0: TrendFollowingStrategy(),
             1: MeanReversionStrategy(),
-            2: VolatilityBreakoutStrategy()
+            2: VolatilityBreakoutStrategy(),
         }
 
         selector = StrategySelector(strategy_map)
@@ -246,7 +262,7 @@ class TestRegimesToStrategiesPipeline:
         strategies = {
             0: TrendFollowingStrategy(),
             1: MeanReversionStrategy(),
-            2: VolatilityBreakoutStrategy()
+            2: VolatilityBreakoutStrategy(),
         }
 
         for regime_id, strategy in strategies.items():
@@ -266,16 +282,19 @@ class TestStrategiesToBacktestPipeline:
     @pytest.fixture
     def strategy_setup(self):
         """Setup data and strategy for testing."""
-        dates = pd.date_range(start='2020-01-01', end='2022-12-31', freq='D')
+        dates = pd.date_range(start="2020-01-01", end="2022-12-31", freq="D")
         n = len(dates)
 
-        data = pd.DataFrame({
-            'open': np.random.randn(n).cumsum() + 100,
-            'high': np.random.randn(n).cumsum() + 102,
-            'low': np.random.randn(n).cumsum() + 98,
-            'close': np.random.randn(n).cumsum() + 100,
-            'volume': np.random.randint(100000, 1000000, n)
-        }, index=dates)
+        data = pd.DataFrame(
+            {
+                "open": np.random.randn(n).cumsum() + 100,
+                "high": np.random.randn(n).cumsum() + 102,
+                "low": np.random.randn(n).cumsum() + 98,
+                "close": np.random.randn(n).cumsum() + 100,
+                "volume": np.random.randint(100000, 1000000, n),
+            },
+            index=dates,
+        )
 
         # Add required features
         engineer = FeatureEngineer()
@@ -302,7 +321,7 @@ class TestStrategiesToBacktestPipeline:
 
         signals = strategy.generate_signals(features)
         positions = strategy.get_positions(signals)
-        market_returns = features['close'].pct_change()
+        market_returns = features["close"].pct_change()
         strategy_returns = strategy.calculate_returns(positions, market_returns)
 
         assert len(strategy_returns) == len(positions)
@@ -315,16 +334,19 @@ class TestCrossModuleCompatibility:
     def test_all_detectors_with_all_strategies(self):
         """Test that all detectors work with all strategies."""
         # Create sample data
-        dates = pd.date_range(start='2020-01-01', end='2022-12-31', freq='D')
+        dates = pd.date_range(start="2020-01-01", end="2022-12-31", freq="D")
         n = len(dates)
 
-        data = pd.DataFrame({
-            'open': np.random.randn(n).cumsum() + 100,
-            'high': np.random.randn(n).cumsum() + 102,
-            'low': np.random.randn(n).cumsum() + 98,
-            'close': np.random.randn(n).cumsum() + 100,
-            'volume': np.random.randint(100000, 1000000, n)
-        }, index=dates)
+        data = pd.DataFrame(
+            {
+                "open": np.random.randn(n).cumsum() + 100,
+                "high": np.random.randn(n).cumsum() + 102,
+                "low": np.random.randn(n).cumsum() + 98,
+                "close": np.random.randn(n).cumsum() + 100,
+                "volume": np.random.randint(100000, 1000000, n),
+            },
+            index=dates,
+        )
 
         # Prepare features
         engineer = FeatureEngineer()
@@ -334,13 +356,13 @@ class TestCrossModuleCompatibility:
         # Test all detector-strategy combinations
         detectors = [
             GMMDetector(n_regimes=3, random_state=42),
-            HMMDetector(n_regimes=3, random_state=42)
+            HMMDetector(n_regimes=3, random_state=42),
         ]
 
         strategies = [
             TrendFollowingStrategy(),
             MeanReversionStrategy(),
-            VolatilityBreakoutStrategy()
+            VolatilityBreakoutStrategy(),
         ]
 
         for detector in detectors:

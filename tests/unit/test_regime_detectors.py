@@ -16,11 +16,13 @@ class TestGMMDetector:
     def sample_features(self):
         """Create sample features."""
         np.random.seed(42)
-        return pd.DataFrame({
-            'volatility': np.random.randn(200) * 0.1 + 0.2,
-            'returns': np.random.randn(200) * 0.02,
-            'momentum': np.random.randn(200) * 0.5
-        })
+        return pd.DataFrame(
+            {
+                "volatility": np.random.randn(200) * 0.1 + 0.2,
+                "returns": np.random.randn(200) * 0.02,
+                "momentum": np.random.randn(200) * 0.5,
+            }
+        )
 
     @pytest.fixture
     def detector(self):
@@ -70,10 +72,12 @@ class TestHMMDetector:
     def sample_features(self):
         """Create sample features."""
         np.random.seed(42)
-        return pd.DataFrame({
-            'volatility': np.random.randn(200) * 0.1 + 0.2,
-            'returns': np.random.randn(200) * 0.02
-        })
+        return pd.DataFrame(
+            {
+                "volatility": np.random.randn(200) * 0.1 + 0.2,
+                "returns": np.random.randn(200) * 0.02,
+            }
+        )
 
     @pytest.fixture
     def detector(self):

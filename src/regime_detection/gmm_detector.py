@@ -38,7 +38,7 @@ class GMMDetector:
         n_regimes: int = 3,
         covariance_type: str = "full",
         random_state: int = 42,
-        max_iter: int = 100
+        max_iter: int = 100,
     ):
         """
         Initialize the GMM regime detector.
@@ -69,8 +69,8 @@ class GMMDetector:
         features: pd.DataFrame,
         n_init: int = 10,
         optimize_n: bool = False,
-        n_range: Optional[Tuple[int, int]] = None
-    ) -> 'GMMDetector':
+        n_range: Optional[Tuple[int, int]] = None,
+    ) -> "GMMDetector":
         """
         Fit GMM to feature data.
 
@@ -92,7 +92,9 @@ class GMMDetector:
         # Scale features
         X_scaled = self.scaler.fit_transform(features)
 
-        logger.info(f"Fitting GMM on {X_scaled.shape[0]} samples, {X_scaled.shape[1]} features")
+        logger.info(
+            f"Fitting GMM on {X_scaled.shape[0]} samples, {X_scaled.shape[1]} features"
+        )
 
         # Optimize number of regimes if requested
         if optimize_n:
@@ -109,7 +111,7 @@ class GMMDetector:
             covariance_type=self.covariance_type,
             random_state=self.random_state,
             max_iter=self.max_iter,
-            n_init=n_init
+            n_init=n_init,
         )
 
         self.gmm.fit(X_scaled)
@@ -166,9 +168,7 @@ class GMMDetector:
         return probas
 
     def get_regime_statistics(
-        self,
-        features: pd.DataFrame,
-        returns: Optional[pd.Series] = None
+        self, features: pd.DataFrame, returns: Optional[pd.Series] = None
     ) -> pd.DataFrame:
         """
         Calculate statistics for each regime.
@@ -195,27 +195,28 @@ class GMMDetector:
             regime_mask = regimes == regime
 
             stats = {
-                'regime': regime,
-                'count': regime_mask.sum(),
-                'percentage': regime_mask.mean() * 100,
-                'avg_confidence': probas[regime_mask, regime].mean(),
-                'mean_duration': self._calculate_mean_duration(regimes, regime)
+                "regime": regime,
+                "count": regime_mask.sum(),
+                "percentage": regime_mask.mean() * 100,
+                "avg_confidence": probas[regime_mask, regime].mean(),
+                "mean_duration": self._calculate_mean_duration(regimes, regime),
             }
 
             # Add feature statistics
             regime_features = features[regime_mask]
             for col in features.columns:
-                stats[f'{col}_mean'] = regime_features[col].mean()
-                stats[f'{col}_std'] = regime_features[col].std()
+                stats[f"{col}_mean"] = regime_features[col].mean()
+                stats[f"{col}_std"] = regime_features[col].std()
 
             # Add return statistics if provided
             if returns is not None:
                 regime_returns = returns[regime_mask]
-                stats['mean_return'] = regime_returns.mean()
-                stats['std_return'] = regime_returns.std()
-                stats['sharpe'] = (
+                stats["mean_return"] = regime_returns.mean()
+                stats["std_return"] = regime_returns.std()
+                stats["sharpe"] = (
                     regime_returns.mean() / regime_returns.std() * np.sqrt(252)
-                    if regime_returns.std() > 0 else 0
+                    if regime_returns.std() > 0
+                    else 0
                 )
 
             stats_list.append(stats)
@@ -240,10 +241,7 @@ class GMMDetector:
 
         X_scaled = self.scaler.transform(features)
 
-        return {
-            'bic': self.gmm.bic(X_scaled),
-            'aic': self.gmm.aic(X_scaled)
-        }
+        return {"bic": self.gmm.bic(X_scaled), "aic": self.gmm.aic(X_scaled)}
 
     def get_regime_transitions(self, regimes: np.ndarray) -> pd.DataFrame:
         """
@@ -274,14 +272,11 @@ class GMMDetector:
         return pd.DataFrame(
             transition_probs,
             index=[f"From_{i}" for i in range(self.n_regimes)],
-            columns=[f"To_{i}" for i in range(self.n_regimes)]
+            columns=[f"To_{i}" for i in range(self.n_regimes)],
         )
 
     def _optimize_n_regimes(
-        self,
-        X: np.ndarray,
-        n_range: Tuple[int, int],
-        n_init: int
+        self, X: np.ndarray, n_range: Tuple[int, int], n_init: int
     ) -> int:
         """
         Find optimal number of regimes using BIC.
@@ -305,7 +300,7 @@ class GMMDetector:
                 covariance_type=self.covariance_type,
                 random_state=self.random_state,
                 max_iter=self.max_iter,
-                n_init=n_init
+                n_init=n_init,
             )
             gmm.fit(X)
             bic = gmm.bic(X)

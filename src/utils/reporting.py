@@ -41,9 +41,7 @@ class PerformanceReporter:
         logger.info(f"PerformanceReporter initialized: output_dir={output_dir}")
 
     def generate_report(
-        self,
-        backtest_results: Dict,
-        strategy_name: Optional[str] = None
+        self, backtest_results: Dict, strategy_name: Optional[str] = None
     ) -> Dict:
         """
         Generate comprehensive performance report.
@@ -56,15 +54,15 @@ class PerformanceReporter:
             Dictionary with report sections
         """
         if strategy_name is None:
-            strategy_name = backtest_results.get('strategy_name', 'Unknown Strategy')
+            strategy_name = backtest_results.get("strategy_name", "Unknown Strategy")
 
         report = {
-            'metadata': self._generate_metadata(strategy_name),
-            'executive_summary': self._generate_executive_summary(backtest_results),
-            'performance_metrics': self._generate_performance_section(backtest_results),
-            'trade_analysis': self._generate_trade_analysis(backtest_results),
-            'regime_analysis': self._generate_regime_section(backtest_results),
-            'risk_metrics': self._generate_risk_section(backtest_results)
+            "metadata": self._generate_metadata(strategy_name),
+            "executive_summary": self._generate_executive_summary(backtest_results),
+            "performance_metrics": self._generate_performance_section(backtest_results),
+            "trade_analysis": self._generate_trade_analysis(backtest_results),
+            "regime_analysis": self._generate_regime_section(backtest_results),
+            "risk_metrics": self._generate_risk_section(backtest_results),
         }
 
         return report
@@ -72,112 +70,109 @@ class PerformanceReporter:
     def _generate_metadata(self, strategy_name: str) -> Dict:
         """Generate report metadata."""
         return {
-            'strategy_name': strategy_name,
-            'report_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'generator': 'Market Regime Detection System'
+            "strategy_name": strategy_name,
+            "report_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "generator": "Market Regime Detection System",
         }
 
     def _generate_executive_summary(self, results: Dict) -> Dict:
         """Generate executive summary section."""
-        metrics = results['metrics']
+        metrics = results["metrics"]
 
         summary = {
-            'total_return': metrics['total_return'],
-            'cagr': metrics['cagr'],
-            'sharpe_ratio': metrics['sharpe_ratio'],
-            'max_drawdown': metrics['max_drawdown'],
-            'win_rate': metrics['win_rate'],
-            'total_trades': metrics['n_trades']
+            "total_return": metrics["total_return"],
+            "cagr": metrics["cagr"],
+            "sharpe_ratio": metrics["sharpe_ratio"],
+            "max_drawdown": metrics["max_drawdown"],
+            "win_rate": metrics["win_rate"],
+            "total_trades": metrics["n_trades"],
         }
 
         # Performance vs buy & hold
-        if 'buy_hold_return' in metrics:
-            summary['outperformance'] = metrics['total_return'] - metrics['buy_hold_return']
+        if "buy_hold_return" in metrics:
+            summary["outperformance"] = (
+                metrics["total_return"] - metrics["buy_hold_return"]
+            )
 
         return summary
 
     def _generate_performance_section(self, results: Dict) -> Dict:
         """Generate detailed performance metrics section."""
-        metrics = results['metrics']
+        metrics = results["metrics"]
 
         performance = {
-            'returns': {
-                'total_return': metrics['total_return'],
-                'cagr': metrics['cagr'],
-                'buy_hold_return': metrics.get('buy_hold_return', None)
+            "returns": {
+                "total_return": metrics["total_return"],
+                "cagr": metrics["cagr"],
+                "buy_hold_return": metrics.get("buy_hold_return", None),
             },
-            'risk_adjusted': {
-                'sharpe_ratio': metrics['sharpe_ratio'],
-                'sortino_ratio': metrics['sortino_ratio'],
-                'calmar_ratio': metrics['calmar_ratio']
+            "risk_adjusted": {
+                "sharpe_ratio": metrics["sharpe_ratio"],
+                "sortino_ratio": metrics["sortino_ratio"],
+                "calmar_ratio": metrics["calmar_ratio"],
             },
-            'volatility': {
-                'annual_volatility': metrics['annual_volatility']
-            },
-            'drawdown': {
-                'max_drawdown': metrics['max_drawdown']
-            }
+            "volatility": {"annual_volatility": metrics["annual_volatility"]},
+            "drawdown": {"max_drawdown": metrics["max_drawdown"]},
         }
 
         return performance
 
     def _generate_trade_analysis(self, results: Dict) -> Dict:
         """Generate trade analysis section."""
-        trades_df = results['trades']
-        metrics = results['metrics']
+        trades_df = results["trades"]
+        metrics = results["metrics"]
 
         if len(trades_df) == 0:
-            return {
-                'total_trades': 0,
-                'message': 'No trades executed'
-            }
+            return {"total_trades": 0, "message": "No trades executed"}
 
         # Calculate trade statistics
-        winning_trades = trades_df[trades_df['return'] > 0]
-        losing_trades = trades_df[trades_df['return'] < 0]
+        winning_trades = trades_df[trades_df["return"] > 0]
+        losing_trades = trades_df[trades_df["return"] < 0]
 
         analysis = {
-            'total_trades': len(trades_df),
-            'winning_trades': len(winning_trades),
-            'losing_trades': len(losing_trades),
-            'win_rate': metrics['win_rate'],
-            'profit_factor': metrics['profit_factor'],
-            'avg_win': winning_trades['return'].mean() if len(winning_trades) > 0 else 0,
-            'avg_loss': losing_trades['return'].mean() if len(losing_trades) > 0 else 0,
-            'largest_win': trades_df['return'].max(),
-            'largest_loss': trades_df['return'].min(),
-            'avg_holding_period': trades_df['holding_period'].mean(),
-            'long_trades': len(trades_df[trades_df['direction'] == 'Long']),
-            'short_trades': len(trades_df[trades_df['direction'] == 'Short'])
+            "total_trades": len(trades_df),
+            "winning_trades": len(winning_trades),
+            "losing_trades": len(losing_trades),
+            "win_rate": metrics["win_rate"],
+            "profit_factor": metrics["profit_factor"],
+            "avg_win": (
+                winning_trades["return"].mean() if len(winning_trades) > 0 else 0
+            ),
+            "avg_loss": losing_trades["return"].mean() if len(losing_trades) > 0 else 0,
+            "largest_win": trades_df["return"].max(),
+            "largest_loss": trades_df["return"].min(),
+            "avg_holding_period": trades_df["holding_period"].mean(),
+            "long_trades": len(trades_df[trades_df["direction"] == "Long"]),
+            "short_trades": len(trades_df[trades_df["direction"] == "Short"]),
         }
 
         return analysis
 
     def _generate_regime_section(self, results: Dict) -> Optional[Dict]:
         """Generate regime-specific analysis section."""
-        metrics = results['metrics']
+        metrics = results["metrics"]
 
-        if 'regime_analysis' not in metrics:
+        if "regime_analysis" not in metrics:
             return None
 
-        regime_analysis = metrics['regime_analysis']
+        regime_analysis = metrics["regime_analysis"]
 
         regime_summary = {}
         for regime_key, regime_metrics in regime_analysis.items():
             regime_summary[regime_key] = {
-                'periods': regime_metrics['n_periods'],
-                'total_return': regime_metrics['total_return'],
-                'sharpe': regime_metrics['sharpe'],
-                'trades': regime_metrics['n_trades'],
-                'win_rate': regime_metrics['win_rate']
+                "periods": regime_metrics["n_periods"],
+                "total_return": regime_metrics["total_return"],
+                "sharpe": regime_metrics["sharpe"],
+                "trades": regime_metrics["n_trades"],
+                "win_rate": regime_metrics["win_rate"],
             }
 
         return regime_summary
 
     def _generate_risk_section(self, results: Dict) -> Dict:
         """Generate risk metrics section."""
-        equity_curve = results['equity_curve']
-        returns = results['returns']
+        equity_curve = results["equity_curve"]
+        returns = results["returns"]
 
         # Calculate additional risk metrics
         var_95 = np.percentile(returns, 5)  # 95% VaR
@@ -188,20 +183,22 @@ class PerformanceReporter:
         winning_streak = self._calculate_max_streak(returns > 0)
 
         risk_metrics = {
-            'value_at_risk_95': var_95,
-            'conditional_var_95': cvar_95,
-            'max_consecutive_losses': losing_streak,
-            'max_consecutive_wins': winning_streak,
-            'downside_volatility': returns[returns < 0].std() * np.sqrt(252)
+            "value_at_risk_95": var_95,
+            "conditional_var_95": cvar_95,
+            "max_consecutive_losses": losing_streak,
+            "max_consecutive_wins": winning_streak,
+            "downside_volatility": returns[returns < 0].std() * np.sqrt(252),
         }
 
         return risk_metrics
 
     def _calculate_max_streak(self, condition_series: pd.Series) -> int:
         """Calculate maximum consecutive streak."""
-        streaks = condition_series.astype(int).groupby(
-            (condition_series != condition_series.shift()).cumsum()
-        ).sum()
+        streaks = (
+            condition_series.astype(int)
+            .groupby((condition_series != condition_series.shift()).cumsum())
+            .sum()
+        )
         return int(streaks.max()) if len(streaks) > 0 else 0
 
     def generate_text_report(self, report: Dict) -> str:
@@ -226,7 +223,7 @@ class PerformanceReporter:
         # Executive Summary
         lines.append("EXECUTIVE SUMMARY")
         lines.append("-" * 80)
-        summary = report['executive_summary']
+        summary = report["executive_summary"]
         lines.append(f"Total Return:        {summary['total_return']:>10.2%}")
         lines.append(f"CAGR:                {summary['cagr']:>10.2%}")
         lines.append(f"Sharpe Ratio:        {summary['sharpe_ratio']:>10.2f}")
@@ -234,24 +231,30 @@ class PerformanceReporter:
         lines.append(f"Win Rate:            {summary['win_rate']:>10.2%}")
         lines.append(f"Total Trades:        {summary['total_trades']:>10d}")
 
-        if 'outperformance' in summary:
+        if "outperformance" in summary:
             lines.append(f"Outperformance:      {summary['outperformance']:>10.2%}")
         lines.append("")
 
         # Performance Metrics
         lines.append("PERFORMANCE METRICS")
         lines.append("-" * 80)
-        perf = report['performance_metrics']
-        lines.append(f"Sortino Ratio:       {perf['risk_adjusted']['sortino_ratio']:>10.2f}")
-        lines.append(f"Calmar Ratio:        {perf['risk_adjusted']['calmar_ratio']:>10.2f}")
-        lines.append(f"Annual Volatility:   {perf['volatility']['annual_volatility']:>10.2%}")
+        perf = report["performance_metrics"]
+        lines.append(
+            f"Sortino Ratio:       {perf['risk_adjusted']['sortino_ratio']:>10.2f}"
+        )
+        lines.append(
+            f"Calmar Ratio:        {perf['risk_adjusted']['calmar_ratio']:>10.2f}"
+        )
+        lines.append(
+            f"Annual Volatility:   {perf['volatility']['annual_volatility']:>10.2%}"
+        )
         lines.append("")
 
         # Trade Analysis
         lines.append("TRADE ANALYSIS")
         lines.append("-" * 80)
-        trade = report['trade_analysis']
-        if trade['total_trades'] > 0:
+        trade = report["trade_analysis"]
+        if trade["total_trades"] > 0:
             lines.append(f"Winning Trades:      {trade['winning_trades']:>10d}")
             lines.append(f"Losing Trades:       {trade['losing_trades']:>10d}")
             lines.append(f"Profit Factor:       {trade['profit_factor']:>10.2f}")
@@ -259,7 +262,9 @@ class PerformanceReporter:
             lines.append(f"Avg Loss:            {trade['avg_loss']:>10.2%}")
             lines.append(f"Largest Win:         {trade['largest_win']:>10.2%}")
             lines.append(f"Largest Loss:        {trade['largest_loss']:>10.2%}")
-            lines.append(f"Avg Hold Period:     {trade['avg_holding_period']:>10.1f} days")
+            lines.append(
+                f"Avg Hold Period:     {trade['avg_holding_period']:>10.1f} days"
+            )
             lines.append(f"Long Trades:         {trade['long_trades']:>10d}")
             lines.append(f"Short Trades:        {trade['short_trades']:>10d}")
         else:
@@ -269,7 +274,7 @@ class PerformanceReporter:
         # Risk Metrics
         lines.append("RISK METRICS")
         lines.append("-" * 80)
-        risk = report['risk_metrics']
+        risk = report["risk_metrics"]
         lines.append(f"Value at Risk (95%): {risk['value_at_risk_95']:>10.2%}")
         lines.append(f"CVaR (95%):          {risk['conditional_var_95']:>10.2%}")
         lines.append(f"Max Losing Streak:   {risk['max_consecutive_losses']:>10d}")
@@ -278,13 +283,15 @@ class PerformanceReporter:
         lines.append("")
 
         # Regime Analysis
-        if report['regime_analysis'] is not None:
+        if report["regime_analysis"] is not None:
             lines.append("REGIME ANALYSIS")
             lines.append("-" * 80)
-            for regime_key, regime_data in report['regime_analysis'].items():
+            for regime_key, regime_data in report["regime_analysis"].items():
                 lines.append(f"\n{regime_key.upper()}:")
                 lines.append(f"  Periods:           {regime_data['periods']:>10d}")
-                lines.append(f"  Total Return:      {regime_data['total_return']:>10.2%}")
+                lines.append(
+                    f"  Total Return:      {regime_data['total_return']:>10.2%}"
+                )
                 lines.append(f"  Sharpe:            {regime_data['sharpe']:>10.2f}")
                 lines.append(f"  Trades:            {regime_data['trades']:>10d}")
                 lines.append(f"  Win Rate:          {regime_data['win_rate']:>10.2%}")
@@ -305,7 +312,7 @@ class PerformanceReporter:
         text_report = self.generate_text_report(report)
         filepath = self.output_dir / filename
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(text_report)
 
         logger.info(f"Text report saved to {filepath}")
@@ -321,7 +328,7 @@ class PerformanceReporter:
         html = self._generate_html(report)
         filepath = self.output_dir / filename
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(html)
 
         logger.info(f"HTML report saved to {filepath}")
@@ -359,23 +366,23 @@ class PerformanceReporter:
 """
 
         # Add executive summary metrics
-        summary = report['executive_summary']
+        summary = report["executive_summary"]
         for key, value in summary.items():
             if isinstance(value, float):
-                if 'return' in key or 'performance' in key:
+                if "return" in key or "performance" in key:
                     value_str = f"{value:.2%}"
-                    css_class = 'positive' if value > 0 else 'negative'
-                elif 'ratio' in key:
+                    css_class = "positive" if value > 0 else "negative"
+                elif "ratio" in key:
                     value_str = f"{value:.2f}"
-                    css_class = 'positive' if value > 0 else 'negative'
+                    css_class = "positive" if value > 0 else "negative"
                 else:
                     value_str = f"{value:.2%}" if abs(value) < 1 else f"{value:.2f}"
-                    css_class = 'positive' if value > 0 else 'negative'
+                    css_class = "positive" if value > 0 else "negative"
             else:
                 value_str = str(value)
-                css_class = ''
+                css_class = ""
 
-            label = key.replace('_', ' ').title()
+            label = key.replace("_", " ").title()
             html += f"""
             <div class="metric">
                 <div class="metric-label">{label}</div>
@@ -395,18 +402,18 @@ class PerformanceReporter:
 """
 
         # Add trade analysis
-        trade = report['trade_analysis']
-        if trade['total_trades'] > 0:
+        trade = report["trade_analysis"]
+        if trade["total_trades"] > 0:
             trade_metrics = [
-                ('Total Trades', trade['total_trades']),
-                ('Winning Trades', trade['winning_trades']),
-                ('Losing Trades', trade['losing_trades']),
-                ('Win Rate', f"{trade['win_rate']:.2%}"),
-                ('Profit Factor', f"{trade['profit_factor']:.2f}"),
-                ('Average Win', f"{trade['avg_win']:.2%}"),
-                ('Average Loss', f"{trade['avg_loss']:.2%}"),
-                ('Largest Win', f"{trade['largest_win']:.2%}"),
-                ('Largest Loss', f"{trade['largest_loss']:.2%}"),
+                ("Total Trades", trade["total_trades"]),
+                ("Winning Trades", trade["winning_trades"]),
+                ("Losing Trades", trade["losing_trades"]),
+                ("Win Rate", f"{trade['win_rate']:.2%}"),
+                ("Profit Factor", f"{trade['profit_factor']:.2f}"),
+                ("Average Win", f"{trade['avg_win']:.2%}"),
+                ("Average Loss", f"{trade['avg_loss']:.2%}"),
+                ("Largest Win", f"{trade['largest_win']:.2%}"),
+                ("Largest Loss", f"{trade['largest_loss']:.2%}"),
             ]
 
             for metric, value in trade_metrics:
@@ -424,13 +431,13 @@ class PerformanceReporter:
 """
 
         # Add risk metrics
-        risk = report['risk_metrics']
+        risk = report["risk_metrics"]
         risk_metrics = [
-            ('Value at Risk (95%)', f"{risk['value_at_risk_95']:.2%}"),
-            ('Conditional VaR (95%)', f"{risk['conditional_var_95']:.2%}"),
-            ('Max Losing Streak', risk['max_consecutive_losses']),
-            ('Max Winning Streak', risk['max_consecutive_wins']),
-            ('Downside Volatility', f"{risk['downside_volatility']:.2%}"),
+            ("Value at Risk (95%)", f"{risk['value_at_risk_95']:.2%}"),
+            ("Conditional VaR (95%)", f"{risk['conditional_var_95']:.2%}"),
+            ("Max Losing Streak", risk["max_consecutive_losses"]),
+            ("Max Winning Streak", risk["max_consecutive_wins"]),
+            ("Downside Volatility", f"{risk['downside_volatility']:.2%}"),
         ]
 
         for metric, value in risk_metrics:
@@ -448,7 +455,7 @@ class PerformanceReporter:
     def compare_strategies(
         self,
         strategy_results: Dict[str, Dict],
-        filename: str = "strategy_comparison.html"
+        filename: str = "strategy_comparison.html",
     ):
         """
         Generate comparison report for multiple strategies.
@@ -460,17 +467,19 @@ class PerformanceReporter:
         comparison_data = []
 
         for strategy_name, results in strategy_results.items():
-            metrics = results['metrics']
-            comparison_data.append({
-                'Strategy': strategy_name,
-                'Total Return': metrics['total_return'],
-                'CAGR': metrics['cagr'],
-                'Sharpe': metrics['sharpe_ratio'],
-                'Sortino': metrics['sortino_ratio'],
-                'Max DD': metrics['max_drawdown'],
-                'Win Rate': metrics['win_rate'],
-                'Trades': metrics['n_trades']
-            })
+            metrics = results["metrics"]
+            comparison_data.append(
+                {
+                    "Strategy": strategy_name,
+                    "Total Return": metrics["total_return"],
+                    "CAGR": metrics["cagr"],
+                    "Sharpe": metrics["sharpe_ratio"],
+                    "Sortino": metrics["sortino_ratio"],
+                    "Max DD": metrics["max_drawdown"],
+                    "Win Rate": metrics["win_rate"],
+                    "Trades": metrics["n_trades"],
+                }
+            )
 
         df = pd.DataFrame(comparison_data)
 
@@ -502,7 +511,7 @@ class PerformanceReporter:
 """
 
         filepath = self.output_dir / filename
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(html)
 
         logger.info(f"Comparison report saved to {filepath}")

@@ -49,11 +49,7 @@ class BaseStrategy(ABC):
         """
         return signals
 
-    def calculate_returns(
-        self,
-        positions: pd.Series,
-        returns: pd.Series
-    ) -> pd.Series:
+    def calculate_returns(self, positions: pd.Series, returns: pd.Series) -> pd.Series:
         """
         Calculate strategy returns.
 

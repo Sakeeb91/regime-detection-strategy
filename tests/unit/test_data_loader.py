@@ -44,10 +44,12 @@ class TestDataLoader:
         # This will make actual API call - use with caution
         # In production, mock the yfinance call
         try:
-            data = loader.load_data("SPY", start_date="2023-01-01", end_date="2023-01-31")
+            data = loader.load_data(
+                "SPY", start_date="2023-01-01", end_date="2023-01-31"
+            )
             assert isinstance(data, pd.DataFrame)
             assert not data.empty
-            assert 'close' in data.columns
+            assert "close" in data.columns
         except Exception as e:
             pytest.skip(f"API call failed: {str(e)}")
 
@@ -55,9 +57,7 @@ class TestDataLoader:
         """Test loading data for multiple symbols."""
         try:
             data = loader.load_data(
-                ["SPY", "QQQ"],
-                start_date="2023-01-01",
-                end_date="2023-01-31"
+                ["SPY", "QQQ"], start_date="2023-01-01", end_date="2023-01-31"
             )
             assert isinstance(data, dict)
             assert "SPY" in data
@@ -68,13 +68,15 @@ class TestDataLoader:
     def test_cache_functionality(self, loader, tmp_path):
         """Test data caching."""
         # Create dummy DataFrame
-        df = pd.DataFrame({
-            'open': [100, 101, 102],
-            'high': [101, 102, 103],
-            'low': [99, 100, 101],
-            'close': [100.5, 101.5, 102.5],
-            'volume': [1000, 1100, 1200]
-        })
+        df = pd.DataFrame(
+            {
+                "open": [100, 101, 102],
+                "high": [101, 102, 103],
+                "low": [99, 100, 101],
+                "close": [100.5, 101.5, 102.5],
+                "volume": [1000, 1100, 1200],
+            }
+        )
 
         # Save to cache
         loader._save_to_cache("TEST", df, "2020-01-01", "2020-01-31")

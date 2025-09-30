@@ -38,7 +38,7 @@ class HMMDetector:
         n_regimes: int = 3,
         covariance_type: str = "full",
         n_iter: int = 100,
-        random_state: int = 42
+        random_state: int = 42,
     ):
         """
         Initialize the HMM regime detector.
@@ -65,10 +65,8 @@ class HMMDetector:
         )
 
     def fit(
-        self,
-        features: pd.DataFrame,
-        lengths: Optional[np.ndarray] = None
-    ) -> 'HMMDetector':
+        self, features: pd.DataFrame, lengths: Optional[np.ndarray] = None
+    ) -> "HMMDetector":
         """
         Fit HMM to feature data.
 
@@ -99,7 +97,7 @@ class HMMDetector:
             covariance_type=self.covariance_type,
             n_iter=self.n_iter,
             random_state=self.random_state,
-            verbose=False
+            verbose=False,
         )
 
         # Fit model
@@ -212,7 +210,7 @@ class HMMDetector:
         return pd.DataFrame(
             self.hmm.transmat_,
             index=[f"From_{i}" for i in range(self.n_regimes)],
-            columns=[f"To_{i}" for i in range(self.n_regimes)]
+            columns=[f"To_{i}" for i in range(self.n_regimes)],
         )
 
     def get_stationary_distribution(self) -> np.ndarray:
@@ -244,7 +242,7 @@ class HMMDetector:
         self,
         features: pd.DataFrame,
         returns: Optional[pd.Series] = None,
-        use_smooth: bool = True
+        use_smooth: bool = True,
     ) -> pd.DataFrame:
         """
         Calculate statistics for each regime.
@@ -275,27 +273,28 @@ class HMMDetector:
             regime_mask = regimes == regime
 
             stats = {
-                'regime': regime,
-                'count': regime_mask.sum(),
-                'percentage': regime_mask.mean() * 100,
-                'avg_confidence': probas[regime_mask, regime].mean(),
-                'mean_duration': self._calculate_mean_duration(regimes, regime)
+                "regime": regime,
+                "count": regime_mask.sum(),
+                "percentage": regime_mask.mean() * 100,
+                "avg_confidence": probas[regime_mask, regime].mean(),
+                "mean_duration": self._calculate_mean_duration(regimes, regime),
             }
 
             # Add feature statistics
             regime_features = features[regime_mask]
             for col in features.columns:
-                stats[f'{col}_mean'] = regime_features[col].mean()
-                stats[f'{col}_std'] = regime_features[col].std()
+                stats[f"{col}_mean"] = regime_features[col].mean()
+                stats[f"{col}_std"] = regime_features[col].std()
 
             # Add return statistics
             if returns is not None:
                 regime_returns = returns[regime_mask]
-                stats['mean_return'] = regime_returns.mean()
-                stats['std_return'] = regime_returns.std()
-                stats['sharpe'] = (
+                stats["mean_return"] = regime_returns.mean()
+                stats["std_return"] = regime_returns.std()
+                stats["sharpe"] = (
                     regime_returns.mean() / regime_returns.std() * np.sqrt(252)
-                    if regime_returns.std() > 0 else 0
+                    if regime_returns.std() > 0
+                    else 0
                 )
 
             stats_list.append(stats)
@@ -325,9 +324,7 @@ class HMMDetector:
         return expected_durations
 
     def simulate(
-        self,
-        n_samples: int,
-        random_state: Optional[int] = None
+        self, n_samples: int, random_state: Optional[int] = None
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Simulate regime sequence and observations from the fitted model.

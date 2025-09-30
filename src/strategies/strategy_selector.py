@@ -21,9 +21,7 @@ class StrategySelector:
     """
 
     def __init__(
-        self,
-        regime_strategy_map: Dict[int, str],
-        transition_smoothing: int = 3
+        self, regime_strategy_map: Dict[int, str], transition_smoothing: int = 3
     ):
         """
         Initialize strategy selector.
@@ -47,7 +45,7 @@ class StrategySelector:
         Returns:
             Strategy name
         """
-        return self.regime_strategy_map.get(regime, 'neutral')
+        return self.regime_strategy_map.get(regime, "neutral")
 
     def get_strategy_series(self, regimes: np.ndarray) -> pd.Series:
         """

@@ -27,7 +27,7 @@ class TestEndToEndPipeline:
     @pytest.fixture
     def sample_data(self):
         """Create sample OHLCV data for testing."""
-        dates = pd.date_range(start='2020-01-01', end='2023-12-31', freq='D')
+        dates = pd.date_range(start="2020-01-01", end="2023-12-31", freq="D")
         n = len(dates)
 
         # Generate synthetic price data with trend and noise
@@ -35,13 +35,16 @@ class TestEndToEndPipeline:
         noise = np.random.randn(n) * 5
         close = trend + noise
 
-        data = pd.DataFrame({
-            'open': close * (1 + np.random.randn(n) * 0.01),
-            'high': close * (1 + abs(np.random.randn(n)) * 0.015),
-            'low': close * (1 - abs(np.random.randn(n)) * 0.015),
-            'close': close,
-            'volume': np.random.randint(1000000, 10000000, n)
-        }, index=dates)
+        data = pd.DataFrame(
+            {
+                "open": close * (1 + np.random.randn(n) * 0.01),
+                "high": close * (1 + abs(np.random.randn(n)) * 0.015),
+                "low": close * (1 - abs(np.random.randn(n)) * 0.015),
+                "close": close,
+                "volume": np.random.randint(1000000, 10000000, n),
+            },
+            index=dates,
+        )
 
         return data
 
@@ -59,7 +62,7 @@ class TestEndToEndPipeline:
         features = engineer.create_features(clean_data)
 
         assert len(features.columns) > len(clean_data.columns)
-        assert 'returns' in features.columns
+        assert "returns" in features.columns
 
         # Step 3: Detect regimes with GMM
         regime_features = engineer.extract_regime_features(features)
@@ -76,11 +79,11 @@ class TestEndToEndPipeline:
         results = backtester.run(strategy, features, regime_labels=regimes)
 
         # Validate results
-        assert 'equity_curve' in results
-        assert 'metrics' in results
-        assert 'trades' in results
-        assert len(results['equity_curve']) == len(features)
-        assert results['metrics']['n_trades'] >= 0
+        assert "equity_curve" in results
+        assert "metrics" in results
+        assert "trades" in results
+        assert len(results["equity_curve"]) == len(features)
+        assert results["metrics"]["n_trades"] >= 0
 
     def test_full_pipeline_hmm(self, sample_data):
         """Test complete pipeline with HMM regime detection."""
@@ -106,8 +109,8 @@ class TestEndToEndPipeline:
         backtester = Backtester(initial_capital=100000)
         results = backtester.run(strategy, features, regime_labels=regimes)
 
-        assert results['metrics']['total_return'] is not None
-        assert 'regime_analysis' in results['metrics']
+        assert results["metrics"]["total_return"] is not None
+        assert "regime_analysis" in results["metrics"]
 
     def test_multiple_strategies(self, sample_data):
         """Test comparing multiple strategies."""
@@ -122,7 +125,7 @@ class TestEndToEndPipeline:
         strategies = [
             TrendFollowingStrategy(),
             MeanReversionStrategy(),
-            VolatilityBreakoutStrategy()
+            VolatilityBreakoutStrategy(),
         ]
 
         # Compare strategies
@@ -130,9 +133,9 @@ class TestEndToEndPipeline:
         comparison = backtester.compare_strategies(strategies, features)
 
         assert len(comparison) == 3
-        assert 'Total Return' in comparison.columns
-        assert 'Sharpe' in comparison.columns
-        assert 'Max DD' in comparison.columns
+        assert "Total Return" in comparison.columns
+        assert "Sharpe" in comparison.columns
+        assert "Max DD" in comparison.columns
 
     def test_regime_specific_performance(self, sample_data):
         """Test that regime-specific analysis works correctly."""
@@ -155,15 +158,15 @@ class TestEndToEndPipeline:
         results = backtester.run(strategy, features, regime_labels=regimes)
 
         # Check regime-specific metrics exist
-        assert 'regime_analysis' in results['metrics']
-        regime_analysis = results['metrics']['regime_analysis']
+        assert "regime_analysis" in results["metrics"]
+        regime_analysis = results["metrics"]["regime_analysis"]
 
         # Should have analysis for each regime
         assert len(regime_analysis) > 0
         for regime_key, regime_metrics in regime_analysis.items():
-            assert 'total_return' in regime_metrics
-            assert 'sharpe' in regime_metrics
-            assert 'n_periods' in regime_metrics
+            assert "total_return" in regime_metrics
+            assert "sharpe" in regime_metrics
+            assert "n_periods" in regime_metrics
 
     def test_transaction_costs_impact(self, sample_data):
         """Test that transaction costs reduce returns."""
@@ -177,23 +180,22 @@ class TestEndToEndPipeline:
 
         # Backtest without costs
         backtester_no_cost = Backtester(
-            initial_capital=100000,
-            commission=0.0,
-            slippage=0.0
+            initial_capital=100000, commission=0.0, slippage=0.0
         )
         results_no_cost = backtester_no_cost.run(strategy, features)
 
         # Backtest with costs
         backtester_with_cost = Backtester(
-            initial_capital=100000,
-            commission=0.001,
-            slippage=0.0005
+            initial_capital=100000, commission=0.001, slippage=0.0005
         )
         results_with_cost = backtester_with_cost.run(strategy, features)
 
         # Returns with costs should be lower (or equal if no trades)
-        if results_no_cost['metrics']['n_trades'] > 0:
-            assert results_with_cost['metrics']['total_return'] <= results_no_cost['metrics']['total_return']
+        if results_no_cost["metrics"]["n_trades"] > 0:
+            assert (
+                results_with_cost["metrics"]["total_return"]
+                <= results_no_cost["metrics"]["total_return"]
+            )
 
     def test_empty_data_handling(self):
         """Test handling of edge cases."""
@@ -256,7 +258,7 @@ class TestPerformanceMetrics:
     def test_sharpe_ratio_calculation(self, tmp_path):
         """Test Sharpe ratio calculation."""
         # Create sample returns
-        dates = pd.date_range(start='2020-01-01', periods=252, freq='D')
+        dates = pd.date_range(start="2020-01-01", periods=252, freq="D")
         returns = pd.Series(np.random.randn(252) * 0.01 + 0.0005, index=dates)
 
         # Calculate Sharpe manually

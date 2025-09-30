@@ -33,7 +33,7 @@ class TransitionPredictor:
         self,
         model_type: str = "random_forest",
         lookahead: int = 1,
-        random_state: int = 42
+        random_state: int = 42,
     ):
         """
         Initialize transition predictor.
@@ -55,10 +55,7 @@ class TransitionPredictor:
         logger.info(f"TransitionPredictor initialized: model_type={model_type}")
 
     def fit(
-        self,
-        features: pd.DataFrame,
-        regimes: np.ndarray,
-        test_size: float = 0.2
+        self, features: pd.DataFrame, regimes: np.ndarray, test_size: float = 0.2
     ) -> Dict[str, float]:
         """
         Fit transition prediction model.
@@ -77,8 +74,8 @@ class TransitionPredictor:
         y = np.roll(regimes, -self.lookahead)
 
         # Remove last lookahead samples (no future data)
-        X = features.iloc[:-self.lookahead]
-        y = y[:-self.lookahead]
+        X = features.iloc[: -self.lookahead]
+        y = y[: -self.lookahead]
 
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(
@@ -97,14 +94,11 @@ class TransitionPredictor:
                 n_estimators=100,
                 max_depth=10,
                 random_state=self.random_state,
-                n_jobs=-1
+                n_jobs=-1,
             )
         elif self.model_type == "xgboost":
             self.model = XGBClassifier(
-                n_estimators=100,
-                max_depth=6,
-                random_state=self.random_state,
-                n_jobs=-1
+                n_estimators=100, max_depth=6, random_state=self.random_state, n_jobs=-1
             )
         else:
             raise ValueError(f"Unknown model_type: {self.model_type}")
@@ -116,12 +110,11 @@ class TransitionPredictor:
         train_score = self.model.score(X_train_scaled, y_train)
         test_score = self.model.score(X_test_scaled, y_test)
 
-        logger.info(f"Train accuracy: {train_score:.3f}, Test accuracy: {test_score:.3f}")
+        logger.info(
+            f"Train accuracy: {train_score:.3f}, Test accuracy: {test_score:.3f}"
+        )
 
-        return {
-            'train_accuracy': train_score,
-            'test_accuracy': test_score
-        }
+        return {"train_accuracy": train_score, "test_accuracy": test_score}
 
     def predict(self, features: pd.DataFrame) -> np.ndarray:
         """
@@ -167,10 +160,9 @@ class TransitionPredictor:
         self._check_fitted()
 
         importances = self.model.feature_importances_
-        feature_imp = pd.DataFrame({
-            'feature': self.feature_names,
-            'importance': importances
-        }).sort_values('importance', ascending=False)
+        feature_imp = pd.DataFrame(
+            {"feature": self.feature_names, "importance": importances}
+        ).sort_values("importance", ascending=False)
 
         return feature_imp
 

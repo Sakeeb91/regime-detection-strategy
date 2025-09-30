@@ -15,7 +15,7 @@ def plot_regimes(
     regimes: np.ndarray,
     title: str = "Market Regimes",
     figsize: tuple = (14, 7),
-    save_path: Optional[str] = None
+    save_path: Optional[str] = None,
 ):
     """
     Plot price series with regime overlay.
@@ -30,7 +30,7 @@ def plot_regimes(
     fig, ax = plt.subplots(figsize=figsize)
 
     # Plot prices
-    ax.plot(prices.index, prices.values, color='black', linewidth=1, label='Price')
+    ax.plot(prices.index, prices.values, color="black", linewidth=1, label="Price")
 
     # Overlay regimes with colors
     n_regimes = len(np.unique(regimes))
@@ -45,17 +45,17 @@ def plot_regimes(
             where=mask,
             alpha=0.3,
             color=colors[regime],
-            label=f'Regime {regime}'
+            label=f"Regime {regime}",
         )
 
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Price')
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Price")
     ax.set_title(title)
     ax.legend()
     ax.grid(True, alpha=0.3)
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
 
     return fig
 
@@ -64,7 +64,7 @@ def plot_equity_curve(
     returns_dict: dict,
     title: str = "Equity Curves",
     figsize: tuple = (14, 7),
-    save_path: Optional[str] = None
+    save_path: Optional[str] = None,
 ):
     """
     Plot equity curves for multiple strategies.
@@ -81,13 +81,13 @@ def plot_equity_curve(
         equity = (1 + returns).cumprod()
         ax.plot(equity.index, equity.values, label=name, linewidth=2)
 
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Cumulative Return')
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Cumulative Return")
     ax.set_title(title)
     ax.legend()
     ax.grid(True, alpha=0.3)
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
 
     return fig

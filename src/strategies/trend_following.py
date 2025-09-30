@@ -46,7 +46,7 @@ class TrendFollowingStrategy(BaseStrategy):
         adx_period: int = 14,
         adx_threshold: float = 25.0,
         use_stops: bool = True,
-        atr_multiplier: float = 2.0
+        atr_multiplier: float = 2.0,
     ):
         """
         Initialize trend following strategy.
@@ -90,36 +90,28 @@ class TrendFollowingStrategy(BaseStrategy):
         df = data.copy()
 
         # Calculate moving averages
-        df['fast_ma'] = df['close'].rolling(window=self.fast_period).mean()
-        df['slow_ma'] = df['close'].rolling(window=self.slow_period).mean()
+        df["fast_ma"] = df["close"].rolling(window=self.fast_period).mean()
+        df["slow_ma"] = df["close"].rolling(window=self.slow_period).mean()
 
         # Calculate ADX for trend strength
-        adx_result = ta.adx(
-            df['high'],
-            df['low'],
-            df['close'],
-            length=self.adx_period
-        )
-        df['adx'] = adx_result[f'ADX_{self.adx_period}']
+        adx_result = ta.adx(df["high"], df["low"], df["close"], length=self.adx_period)
+        df["adx"] = adx_result[f"ADX_{self.adx_period}"]
 
         # Calculate ATR for volatility-based stops
         if self.use_stops:
-            df['atr'] = ta.atr(
-                df['high'],
-                df['low'],
-                df['close'],
-                length=self.adx_period
+            df["atr"] = ta.atr(
+                df["high"], df["low"], df["close"], length=self.adx_period
             )
 
         # Initialize signals
         signals = pd.Series(0, index=df.index)
 
         # Trend condition: fast MA above/below slow MA
-        bullish_trend = df['fast_ma'] > df['slow_ma']
-        bearish_trend = df['fast_ma'] < df['slow_ma']
+        bullish_trend = df["fast_ma"] > df["slow_ma"]
+        bearish_trend = df["fast_ma"] < df["slow_ma"]
 
         # Strong trend condition: ADX above threshold
-        strong_trend = df['adx'] > self.adx_threshold
+        strong_trend = df["adx"] > self.adx_threshold
 
         # Generate signals
         # Long: bullish crossover with strong trend
@@ -129,7 +121,7 @@ class TrendFollowingStrategy(BaseStrategy):
         signals[bearish_trend & strong_trend] = -1
 
         # Fill forward to maintain position until reversal
-        signals = signals.replace(0, np.nan).fillna(method='ffill').fillna(0)
+        signals = signals.replace(0, np.nan).fillna(method="ffill").fillna(0)
 
         logger.debug(
             f"Generated {(signals == 1).sum()} long and "
@@ -152,7 +144,9 @@ class TrendFollowingStrategy(BaseStrategy):
         # Future enhancement: implement trailing stops using ATR
         return signals
 
-    def get_stop_levels(self, data: pd.DataFrame, signals: pd.Series) -> Dict[str, pd.Series]:
+    def get_stop_levels(
+        self, data: pd.DataFrame, signals: pd.Series
+    ) -> Dict[str, pd.Series]:
         """
         Calculate stop loss levels using ATR.
 
@@ -164,26 +158,18 @@ class TrendFollowingStrategy(BaseStrategy):
             Dictionary with 'stop_long' and 'stop_short' series
         """
         if not self.use_stops:
-            return {'stop_long': None, 'stop_short': None}
+            return {"stop_long": None, "stop_short": None}
 
         df = data.copy()
 
         # Calculate ATR
-        df['atr'] = ta.atr(
-            df['high'],
-            df['low'],
-            df['close'],
-            length=self.adx_period
-        )
+        df["atr"] = ta.atr(df["high"], df["low"], df["close"], length=self.adx_period)
 
         # Calculate stop levels
-        stop_long = df['close'] - (self.atr_multiplier * df['atr'])
-        stop_short = df['close'] + (self.atr_multiplier * df['atr'])
+        stop_long = df["close"] - (self.atr_multiplier * df["atr"])
+        stop_short = df["close"] + (self.atr_multiplier * df["atr"])
 
-        return {
-            'stop_long': stop_long,
-            'stop_short': stop_short
-        }
+        return {"stop_long": stop_long, "stop_short": stop_short}
 
     def get_parameters(self) -> Dict:
         """
@@ -193,11 +179,11 @@ class TrendFollowingStrategy(BaseStrategy):
             Dictionary of strategy parameters
         """
         return {
-            'name': self.name,
-            'fast_period': self.fast_period,
-            'slow_period': self.slow_period,
-            'adx_period': self.adx_period,
-            'adx_threshold': self.adx_threshold,
-            'use_stops': self.use_stops,
-            'atr_multiplier': self.atr_multiplier
+            "name": self.name,
+            "fast_period": self.fast_period,
+            "slow_period": self.slow_period,
+            "adx_period": self.adx_period,
+            "adx_threshold": self.adx_threshold,
+            "use_stops": self.use_stops,
+            "atr_multiplier": self.atr_multiplier,
         }

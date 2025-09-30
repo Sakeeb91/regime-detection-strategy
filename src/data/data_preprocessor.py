@@ -28,7 +28,7 @@ class DataPreprocessor:
         self,
         fill_method: str = "forward",
         outlier_std: float = 5.0,
-        min_data_points: int = 100
+        min_data_points: int = 100,
     ):
         """
         Initialize the DataPreprocessor.
@@ -48,7 +48,7 @@ class DataPreprocessor:
         self,
         df: pd.DataFrame,
         remove_outliers: bool = True,
-        handle_missing: bool = True
+        handle_missing: bool = True,
     ) -> pd.DataFrame:
         """
         Clean and preprocess market data.
@@ -77,7 +77,7 @@ class DataPreprocessor:
 
         # Remove duplicates
         original_len = len(df)
-        df = df[~df.index.duplicated(keep='first')]
+        df = df[~df.index.duplicated(keep="first")]
         if len(df) < original_len:
             logger.warning(f"Removed {original_len - len(df)} duplicate rows")
 
@@ -117,7 +117,7 @@ class DataPreprocessor:
             return False, f"Insufficient data: {len(df)} < {self.min_data_points}"
 
         # Check for required columns
-        required_cols = ['open', 'high', 'low', 'close', 'volume']
+        required_cols = ["open", "high", "low", "close", "volume"]
         missing_cols = [col for col in required_cols if col not in df.columns]
         if missing_cols:
             return False, f"Missing required columns: {missing_cols}"
@@ -130,31 +130,31 @@ class DataPreprocessor:
 
         # Check for invalid OHLC relationships
         invalid_ohlc = ~(
-            (df['high'] >= df['low']) &
-            (df['high'] >= df['open']) &
-            (df['high'] >= df['close']) &
-            (df['low'] <= df['open']) &
-            (df['low'] <= df['close'])
+            (df["high"] >= df["low"])
+            & (df["high"] >= df["open"])
+            & (df["high"] >= df["close"])
+            & (df["low"] <= df["open"])
+            & (df["low"] <= df["close"])
         )
         if invalid_ohlc.sum() > 0:
-            return False, f"Found {invalid_ohlc.sum()} rows with invalid OHLC relationships"
+            return (
+                False,
+                f"Found {invalid_ohlc.sum()} rows with invalid OHLC relationships",
+            )
 
         # Check for non-positive prices
-        price_cols = ['open', 'high', 'low', 'close']
+        price_cols = ["open", "high", "low", "close"]
         if (df[price_cols] <= 0).any().any():
             return False, "Found non-positive prices"
 
         # Check for non-negative volume
-        if (df['volume'] < 0).any():
+        if (df["volume"] < 0).any():
             return False, "Found negative volume values"
 
         return True, "Data validation passed"
 
     def resample_data(
-        self,
-        df: pd.DataFrame,
-        frequency: str = "1D",
-        aggregation: str = "ohlc"
+        self, df: pd.DataFrame, frequency: str = "1D", aggregation: str = "ohlc"
     ) -> pd.DataFrame:
         """
         Resample data to different frequency.
@@ -172,13 +172,15 @@ class DataPreprocessor:
             >>> weekly_df = preprocessor.resample_data(daily_df, frequency='1W')
         """
         if aggregation == "ohlc":
-            resampled = pd.DataFrame({
-                'open': df['open'].resample(frequency).first(),
-                'high': df['high'].resample(frequency).max(),
-                'low': df['low'].resample(frequency).min(),
-                'close': df['close'].resample(frequency).last(),
-                'volume': df['volume'].resample(frequency).sum()
-            })
+            resampled = pd.DataFrame(
+                {
+                    "open": df["open"].resample(frequency).first(),
+                    "high": df["high"].resample(frequency).max(),
+                    "low": df["low"].resample(frequency).min(),
+                    "close": df["close"].resample(frequency).last(),
+                    "volume": df["volume"].resample(frequency).sum(),
+                }
+            )
         elif aggregation == "mean":
             resampled = df.resample(frequency).mean()
         elif aggregation == "last":
@@ -191,10 +193,7 @@ class DataPreprocessor:
         return resampled.dropna()
 
     def calculate_returns(
-        self,
-        df: pd.DataFrame,
-        price_col: str = "close",
-        method: str = "log"
+        self, df: pd.DataFrame, price_col: str = "close", method: str = "log"
     ) -> pd.Series:
         """
         Calculate returns from price data.
@@ -237,17 +236,21 @@ class DataPreprocessor:
         if missing_count == 0:
             return df
 
-        logger.info(f"Handling {missing_count} missing values using '{self.fill_method}' method")
+        logger.info(
+            f"Handling {missing_count} missing values using '{self.fill_method}' method"
+        )
 
         if self.fill_method == "forward":
-            df = df.fillna(method='ffill').fillna(method='bfill')
+            df = df.fillna(method="ffill").fillna(method="bfill")
         elif self.fill_method == "linear":
-            df = df.interpolate(method='linear', limit_direction='both')
+            df = df.interpolate(method="linear", limit_direction="both")
         elif self.fill_method == "mean":
             df = df.fillna(df.mean())
         else:
-            logger.warning(f"Unknown fill method '{self.fill_method}', using forward fill")
-            df = df.fillna(method='ffill').fillna(method='bfill')
+            logger.warning(
+                f"Unknown fill method '{self.fill_method}', using forward fill"
+            )
+            df = df.fillna(method="ffill").fillna(method="bfill")
 
         return df
 
@@ -262,8 +265,8 @@ class DataPreprocessor:
             DataFrame with outliers removed
         """
         # Calculate returns for outlier detection
-        if 'close' in df.columns:
-            returns = df['close'].pct_change()
+        if "close" in df.columns:
+            returns = df["close"].pct_change()
 
             # Calculate z-scores
             z_scores = np.abs(stats.zscore(returns.dropna()))
@@ -272,12 +275,14 @@ class DataPreprocessor:
             outlier_mask = z_scores > self.outlier_std
 
             if outlier_mask.sum() > 0:
-                logger.warning(f"Detected {outlier_mask.sum()} outliers (>{self.outlier_std} std)")
+                logger.warning(
+                    f"Detected {outlier_mask.sum()} outliers (>{self.outlier_std} std)"
+                )
 
                 # Replace outliers with interpolated values
                 outlier_indices = returns.dropna().index[outlier_mask]
-                df.loc[outlier_indices, 'close'] = np.nan
-                df['close'] = df['close'].interpolate(method='linear')
+                df.loc[outlier_indices, "close"] = np.nan
+                df["close"] = df["close"].interpolate(method="linear")
 
         return df
 
@@ -292,10 +297,10 @@ class DataPreprocessor:
             DataFrame with corrected data types
         """
         # Convert numeric columns to float
-        numeric_cols = ['open', 'high', 'low', 'close', 'volume']
+        numeric_cols = ["open", "high", "low", "close", "volume"]
         for col in numeric_cols:
             if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
+                df[col] = pd.to_numeric(df[col], errors="coerce")
 
         # Ensure datetime index
         if not isinstance(df.index, pd.DatetimeIndex):

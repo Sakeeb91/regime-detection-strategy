@@ -40,7 +40,7 @@ class Backtester:
         commission: float = 0.001,
         slippage: float = 0.0005,
         position_size: float = 1.0,
-        leverage: float = 1.0
+        leverage: float = 1.0,
     ):
         """
         Initialize backtester.
@@ -67,7 +67,7 @@ class Backtester:
         self,
         strategy: BaseStrategy,
         data: pd.DataFrame,
-        regime_labels: Optional[pd.Series] = None
+        regime_labels: Optional[pd.Series] = None,
     ) -> Dict:
         """
         Run backtest for a strategy.
@@ -92,47 +92,40 @@ class Backtester:
         positions = strategy.get_positions(signals)
 
         # Calculate returns
-        market_returns = data['close'].pct_change()
+        market_returns = data["close"].pct_change()
 
         # Initialize portfolio tracking
         portfolio = self._simulate_portfolio(
-            data=data,
-            positions=positions,
-            market_returns=market_returns
+            data=data, positions=positions, market_returns=market_returns
         )
 
         # Calculate metrics
         metrics = self._calculate_metrics(
-            portfolio['equity_curve'],
-            portfolio['returns'],
-            positions,
-            market_returns
+            portfolio["equity_curve"], portfolio["returns"], positions, market_returns
         )
 
         # Analyze trades
         trades = self._analyze_trades(
-            positions=positions,
-            prices=data['close'],
-            dates=data.index
+            positions=positions, prices=data["close"], dates=data.index
         )
 
         # Add regime-specific analysis if available
         if regime_labels is not None:
             regime_analysis = self._analyze_by_regime(
-                returns=portfolio['returns'],
+                returns=portfolio["returns"],
                 positions=positions,
-                regime_labels=regime_labels
+                regime_labels=regime_labels,
             )
-            metrics['regime_analysis'] = regime_analysis
+            metrics["regime_analysis"] = regime_analysis
 
         results = {
-            'strategy_name': strategy.name,
-            'equity_curve': portfolio['equity_curve'],
-            'returns': portfolio['returns'],
-            'positions': positions,
-            'trades': trades,
-            'metrics': metrics,
-            'signals': signals
+            "strategy_name": strategy.name,
+            "equity_curve": portfolio["equity_curve"],
+            "returns": portfolio["returns"],
+            "positions": positions,
+            "trades": trades,
+            "metrics": metrics,
+            "signals": signals,
         }
 
         logger.info(
@@ -143,10 +136,7 @@ class Backtester:
         return results
 
     def _simulate_portfolio(
-        self,
-        data: pd.DataFrame,
-        positions: pd.Series,
-        market_returns: pd.Series
+        self, data: pd.DataFrame, positions: pd.Series, market_returns: pd.Series
     ) -> Dict:
         """
         Simulate portfolio evolution with transaction costs.
@@ -170,8 +160,8 @@ class Backtester:
             prev_position = positions.iloc[i - 1]
             curr_position = positions.iloc[i]
 
-            price = data['close'].iloc[i]
-            prev_price = data['close'].iloc[i - 1]
+            price = data["close"].iloc[i]
+            prev_price = data["close"].iloc[i - 1]
 
             # Calculate unrealized P&L from existing position
             if shares != 0:
@@ -191,7 +181,9 @@ class Backtester:
                 # Open new position
                 if curr_position != 0:
                     position_value = cash * self.position_size * self.leverage
-                    shares = (curr_position * position_value) / (price * (1 + self.slippage * curr_position))
+                    shares = (curr_position * position_value) / (
+                        price * (1 + self.slippage * curr_position)
+                    )
                     commission_cost = abs(shares * price) * self.commission
                     cash -= shares * price + commission_cost
 
@@ -205,8 +197,8 @@ class Backtester:
         portfolio_returns = [0] + portfolio_returns
 
         return {
-            'equity_curve': equity,
-            'returns': pd.Series(portfolio_returns, index=data.index)
+            "equity_curve": equity,
+            "returns": pd.Series(portfolio_returns, index=data.index),
         }
 
     def _calculate_metrics(
@@ -214,7 +206,7 @@ class Backtester:
         equity_curve: pd.Series,
         returns: pd.Series,
         positions: pd.Series,
-        market_returns: pd.Series
+        market_returns: pd.Series,
     ) -> Dict:
         """
         Calculate performance metrics.
@@ -236,18 +228,26 @@ class Backtester:
         n_periods = len(returns)
         years = n_periods / trading_days
 
-        cagr = (equity_curve.iloc[-1] / equity_curve.iloc[0]) ** (1 / years) - 1 if years > 0 else 0
+        cagr = (
+            (equity_curve.iloc[-1] / equity_curve.iloc[0]) ** (1 / years) - 1
+            if years > 0
+            else 0
+        )
 
         # Volatility
         annual_vol = returns.std() * np.sqrt(trading_days)
 
         # Sharpe ratio (assuming 0% risk-free rate)
-        sharpe_ratio = (returns.mean() * trading_days) / annual_vol if annual_vol > 0 else 0
+        sharpe_ratio = (
+            (returns.mean() * trading_days) / annual_vol if annual_vol > 0 else 0
+        )
 
         # Sortino ratio (downside deviation)
         downside_returns = returns[returns < 0]
         downside_std = downside_returns.std() * np.sqrt(trading_days)
-        sortino_ratio = (returns.mean() * trading_days) / downside_std if downside_std > 0 else 0
+        sortino_ratio = (
+            (returns.mean() * trading_days) / downside_std if downside_std > 0 else 0
+        )
 
         # Drawdown analysis
         cumulative = (1 + returns).cumprod()
@@ -262,7 +262,11 @@ class Backtester:
         winning_trades = returns[returns > 0]
         losing_trades = returns[returns < 0]
 
-        win_rate = len(winning_trades) / len(returns[returns != 0]) if len(returns[returns != 0]) > 0 else 0
+        win_rate = (
+            len(winning_trades) / len(returns[returns != 0])
+            if len(returns[returns != 0]) > 0
+            else 0
+        )
 
         profit_factor = (
             winning_trades.sum() / abs(losing_trades.sum())
@@ -279,26 +283,23 @@ class Backtester:
         short_positions = (positions == -1).sum()
 
         return {
-            'total_return': total_return,
-            'cagr': cagr,
-            'annual_volatility': annual_vol,
-            'sharpe_ratio': sharpe_ratio,
-            'sortino_ratio': sortino_ratio,
-            'max_drawdown': max_drawdown,
-            'calmar_ratio': calmar_ratio,
-            'win_rate': win_rate,
-            'profit_factor': profit_factor,
-            'n_trades': n_trades,
-            'long_positions': long_positions,
-            'short_positions': short_positions,
-            'buy_hold_return': buy_hold_return
+            "total_return": total_return,
+            "cagr": cagr,
+            "annual_volatility": annual_vol,
+            "sharpe_ratio": sharpe_ratio,
+            "sortino_ratio": sortino_ratio,
+            "max_drawdown": max_drawdown,
+            "calmar_ratio": calmar_ratio,
+            "win_rate": win_rate,
+            "profit_factor": profit_factor,
+            "n_trades": n_trades,
+            "long_positions": long_positions,
+            "short_positions": short_positions,
+            "buy_hold_return": buy_hold_return,
         }
 
     def _analyze_trades(
-        self,
-        positions: pd.Series,
-        prices: pd.Series,
-        dates: pd.DatetimeIndex
+        self, positions: pd.Series, prices: pd.Series, dates: pd.DatetimeIndex
     ) -> pd.DataFrame:
         """
         Analyze individual trades.
@@ -340,15 +341,17 @@ class Backtester:
 
                 holding_period = (exit_date - entry_date).days
 
-                trades.append({
-                    'entry_date': entry_date,
-                    'exit_date': exit_date,
-                    'direction': 'Long' if entry_position == 1 else 'Short',
-                    'entry_price': entry_price,
-                    'exit_price': exit_price,
-                    'return': pnl_pct,
-                    'holding_period': holding_period
-                })
+                trades.append(
+                    {
+                        "entry_date": entry_date,
+                        "exit_date": exit_date,
+                        "direction": "Long" if entry_position == 1 else "Short",
+                        "entry_price": entry_price,
+                        "exit_price": exit_price,
+                        "return": pnl_pct,
+                        "holding_period": holding_period,
+                    }
+                )
 
                 entry_date = None
                 entry_price = None
@@ -357,10 +360,7 @@ class Backtester:
         return pd.DataFrame(trades)
 
     def _analyze_by_regime(
-        self,
-        returns: pd.Series,
-        positions: pd.Series,
-        regime_labels: pd.Series
+        self, returns: pd.Series, positions: pd.Series, regime_labels: pd.Series
     ) -> Dict:
         """
         Analyze performance by market regime.
@@ -381,12 +381,21 @@ class Backtester:
             regime_positions = positions[mask]
 
             if len(regime_returns) > 0:
-                regime_analysis[f'regime_{regime}'] = {
-                    'n_periods': len(regime_returns),
-                    'total_return': (1 + regime_returns).prod() - 1,
-                    'sharpe': regime_returns.mean() / regime_returns.std() * np.sqrt(252) if regime_returns.std() > 0 else 0,
-                    'n_trades': (regime_positions.diff() != 0).sum(),
-                    'win_rate': len(regime_returns[regime_returns > 0]) / len(regime_returns[regime_returns != 0]) if len(regime_returns[regime_returns != 0]) > 0 else 0
+                regime_analysis[f"regime_{regime}"] = {
+                    "n_periods": len(regime_returns),
+                    "total_return": (1 + regime_returns).prod() - 1,
+                    "sharpe": (
+                        regime_returns.mean() / regime_returns.std() * np.sqrt(252)
+                        if regime_returns.std() > 0
+                        else 0
+                    ),
+                    "n_trades": (regime_positions.diff() != 0).sum(),
+                    "win_rate": (
+                        len(regime_returns[regime_returns > 0])
+                        / len(regime_returns[regime_returns != 0])
+                        if len(regime_returns[regime_returns != 0]) > 0
+                        else 0
+                    ),
                 }
 
         return regime_analysis
@@ -395,7 +404,7 @@ class Backtester:
         self,
         strategies: List[BaseStrategy],
         data: pd.DataFrame,
-        regime_labels: Optional[pd.Series] = None
+        regime_labels: Optional[pd.Series] = None,
     ) -> pd.DataFrame:
         """
         Compare multiple strategies.
@@ -412,21 +421,23 @@ class Backtester:
 
         for strategy in strategies:
             backtest_results = self.run(strategy, data, regime_labels)
-            metrics = backtest_results['metrics']
+            metrics = backtest_results["metrics"]
 
-            results.append({
-                'Strategy': strategy.name,
-                'Total Return': metrics['total_return'],
-                'CAGR': metrics['cagr'],
-                'Sharpe': metrics['sharpe_ratio'],
-                'Sortino': metrics['sortino_ratio'],
-                'Max DD': metrics['max_drawdown'],
-                'Calmar': metrics['calmar_ratio'],
-                'Win Rate': metrics['win_rate'],
-                'Trades': metrics['n_trades']
-            })
+            results.append(
+                {
+                    "Strategy": strategy.name,
+                    "Total Return": metrics["total_return"],
+                    "CAGR": metrics["cagr"],
+                    "Sharpe": metrics["sharpe_ratio"],
+                    "Sortino": metrics["sortino_ratio"],
+                    "Max DD": metrics["max_drawdown"],
+                    "Calmar": metrics["calmar_ratio"],
+                    "Win Rate": metrics["win_rate"],
+                    "Trades": metrics["n_trades"],
+                }
+            )
 
         comparison_df = pd.DataFrame(results)
-        comparison_df = comparison_df.set_index('Strategy')
+        comparison_df = comparison_df.set_index("Strategy")
 
         return comparison_df

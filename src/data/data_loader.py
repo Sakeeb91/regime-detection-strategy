@@ -52,7 +52,7 @@ class DataLoader:
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         interval: str = "1d",
-        source: str = "yahoo"
+        source: str = "yahoo",
     ) -> Union[pd.DataFrame, Dict[str, pd.DataFrame]]:
         """
         Load market data for one or more symbols.
@@ -94,7 +94,9 @@ class DataLoader:
         # Validate date range
         self._validate_dates(start_date, end_date)
 
-        logger.info(f"Loading data for {len(symbols)} symbols from {start_date} to {end_date}")
+        logger.info(
+            f"Loading data for {len(symbols)} symbols from {start_date} to {end_date}"
+        )
 
         # Load data based on source
         if source == "yahoo":
@@ -110,11 +112,7 @@ class DataLoader:
         return data_dict
 
     def _load_from_yahoo(
-        self,
-        symbols: List[str],
-        start_date: str,
-        end_date: str,
-        interval: str
+        self, symbols: List[str], start_date: str, end_date: str, interval: str
     ) -> Dict[str, pd.DataFrame]:
         """
         Load data from Yahoo Finance.
@@ -169,10 +167,7 @@ class DataLoader:
         return data_dict
 
     def _load_from_alpha_vantage(
-        self,
-        symbols: List[str],
-        start_date: str,
-        end_date: str
+        self, symbols: List[str], start_date: str, end_date: str
     ) -> Dict[str, pd.DataFrame]:
         """
         Load data from Alpha Vantage API.
@@ -221,10 +216,7 @@ class DataLoader:
             raise ValueError(f"Invalid date format. Use 'YYYY-MM-DD': {str(e)}")
 
     def _load_from_cache(
-        self,
-        symbol: str,
-        start_date: str,
-        end_date: str
+        self, symbol: str, start_date: str, end_date: str
     ) -> Optional[pd.DataFrame]:
         """
         Load data from cache if available.
@@ -238,8 +230,7 @@ class DataLoader:
             Cached DataFrame or None if not found
         """
         cache_file = os.path.join(
-            self.cache_dir,
-            f"{symbol}_{start_date}_{end_date}.parquet"
+            self.cache_dir, f"{symbol}_{start_date}_{end_date}.parquet"
         )
 
         if os.path.exists(cache_file):
@@ -253,11 +244,7 @@ class DataLoader:
         return None
 
     def _save_to_cache(
-        self,
-        symbol: str,
-        df: pd.DataFrame,
-        start_date: str,
-        end_date: str
+        self, symbol: str, df: pd.DataFrame, start_date: str, end_date: str
     ) -> None:
         """
         Save DataFrame to cache.
@@ -269,8 +256,7 @@ class DataLoader:
             end_date: End date string
         """
         cache_file = os.path.join(
-            self.cache_dir,
-            f"{symbol}_{start_date}_{end_date}.parquet"
+            self.cache_dir, f"{symbol}_{start_date}_{end_date}.parquet"
         )
 
         try:

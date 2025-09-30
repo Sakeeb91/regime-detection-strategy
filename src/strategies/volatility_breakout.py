@@ -47,7 +47,7 @@ class VolatilityBreakoutStrategy(BaseStrategy):
         atr_multiplier: float = 1.5,
         volume_factor: float = 1.5,
         use_volume_filter: bool = True,
-        trailing_stop_atr: float = 2.5
+        trailing_stop_atr: float = 2.5,
     ):
         """
         Initialize volatility breakout strategy.
@@ -91,43 +91,38 @@ class VolatilityBreakoutStrategy(BaseStrategy):
         df = data.copy()
 
         # Calculate Donchian Channels
-        df['donchian_upper'] = df['high'].rolling(window=self.lookback_period).max()
-        df['donchian_lower'] = df['low'].rolling(window=self.lookback_period).min()
-        df['donchian_middle'] = (df['donchian_upper'] + df['donchian_lower']) / 2
+        df["donchian_upper"] = df["high"].rolling(window=self.lookback_period).max()
+        df["donchian_lower"] = df["low"].rolling(window=self.lookback_period).min()
+        df["donchian_middle"] = (df["donchian_upper"] + df["donchian_lower"]) / 2
 
         # Calculate ATR for volatility measurement
-        df['atr'] = ta.atr(
-            df['high'],
-            df['low'],
-            df['close'],
-            length=self.atr_period
-        )
+        df["atr"] = ta.atr(df["high"], df["low"], df["close"], length=self.atr_period)
 
         # Calculate volume confirmation
         if self.use_volume_filter:
-            df['volume_ma'] = df['volume'].rolling(window=self.lookback_period).mean()
-            df['volume_ratio'] = df['volume'] / df['volume_ma']
+            df["volume_ma"] = df["volume"].rolling(window=self.lookback_period).mean()
+            df["volume_ratio"] = df["volume"] / df["volume_ma"]
 
         # Calculate channel width (normalized by ATR)
-        df['channel_width'] = (df['donchian_upper'] - df['donchian_lower']) / df['atr']
+        df["channel_width"] = (df["donchian_upper"] - df["donchian_lower"]) / df["atr"]
 
         # Initialize signals
         signals = pd.Series(0, index=df.index)
 
         # Bullish breakout: close above upper channel
-        bullish_breakout = df['close'] > df['donchian_upper'].shift(1)
+        bullish_breakout = df["close"] > df["donchian_upper"].shift(1)
 
         # Bearish breakout: close below lower channel
-        bearish_breakout = df['close'] < df['donchian_lower'].shift(1)
+        bearish_breakout = df["close"] < df["donchian_lower"].shift(1)
 
         # Apply volume filter if enabled
         if self.use_volume_filter:
-            volume_confirmed = df['volume_ratio'] > self.volume_factor
+            volume_confirmed = df["volume_ratio"] > self.volume_factor
             bullish_breakout = bullish_breakout & volume_confirmed
             bearish_breakout = bearish_breakout & volume_confirmed
 
         # Apply ATR filter: only trade when volatility is elevated
-        high_volatility = df['atr'] > df['atr'].rolling(window=50).mean()
+        high_volatility = df["atr"] > df["atr"].rolling(window=50).mean()
         bullish_breakout = bullish_breakout & high_volatility
         bearish_breakout = bearish_breakout & high_volatility
 
@@ -136,8 +131,8 @@ class VolatilityBreakoutStrategy(BaseStrategy):
         signals[bearish_breakout] = -1
 
         # Calculate trailing stops
-        df['trail_stop_long'] = df['close'] - (self.trailing_stop_atr * df['atr'])
-        df['trail_stop_short'] = df['close'] + (self.trailing_stop_atr * df['atr'])
+        df["trail_stop_long"] = df["close"] - (self.trailing_stop_atr * df["atr"])
+        df["trail_stop_short"] = df["close"] + (self.trailing_stop_atr * df["atr"])
 
         # Apply exit logic with trailing stops
         signals = self._apply_trailing_stops(signals, df)
@@ -149,11 +144,7 @@ class VolatilityBreakoutStrategy(BaseStrategy):
 
         return signals
 
-    def _apply_trailing_stops(
-        self,
-        signals: pd.Series,
-        df: pd.DataFrame
-    ) -> pd.Series:
+    def _apply_trailing_stops(self, signals: pd.Series, df: pd.DataFrame) -> pd.Series:
         """
         Apply trailing stop logic to signals.
 
@@ -173,26 +164,26 @@ class VolatilityBreakoutStrategy(BaseStrategy):
             if signals.iloc[i] != 0:
                 position = signals.iloc[i]
                 if position == 1:
-                    trail_stop = df['trail_stop_long'].iloc[i]
+                    trail_stop = df["trail_stop_long"].iloc[i]
                 else:
-                    trail_stop = df['trail_stop_short'].iloc[i]
+                    trail_stop = df["trail_stop_short"].iloc[i]
                 result.iloc[i] = position
             # Update trailing stop for existing position
             elif position != 0:
                 if position == 1:
                     # Update long trailing stop (raise only)
-                    trail_stop = max(trail_stop, df['trail_stop_long'].iloc[i])
+                    trail_stop = max(trail_stop, df["trail_stop_long"].iloc[i])
                     # Check if stopped out
-                    if df['close'].iloc[i] < trail_stop:
+                    if df["close"].iloc[i] < trail_stop:
                         position = 0
                         result.iloc[i] = 0
                     else:
                         result.iloc[i] = 1
                 else:  # position == -1
                     # Update short trailing stop (lower only)
-                    trail_stop = min(trail_stop, df['trail_stop_short'].iloc[i])
+                    trail_stop = min(trail_stop, df["trail_stop_short"].iloc[i])
                     # Check if stopped out
-                    if df['close'].iloc[i] > trail_stop:
+                    if df["close"].iloc[i] > trail_stop:
                         position = 0
                         result.iloc[i] = 0
                     else:
@@ -215,9 +206,7 @@ class VolatilityBreakoutStrategy(BaseStrategy):
         return signals
 
     def calculate_position_size(
-        self,
-        data: pd.DataFrame,
-        risk_per_trade: float = 0.02
+        self, data: pd.DataFrame, risk_per_trade: float = 0.02
     ) -> pd.Series:
         """
         Calculate position size based on ATR volatility.
@@ -234,16 +223,13 @@ class VolatilityBreakoutStrategy(BaseStrategy):
         df = data.copy()
 
         # Calculate ATR
-        df['atr'] = ta.atr(
-            df['high'],
-            df['low'],
-            df['close'],
-            length=self.atr_period
-        )
+        df["atr"] = ta.atr(df["high"], df["low"], df["close"], length=self.atr_period)
 
         # Calculate position size: risk / (ATR * multiplier)
         # Smaller positions in high volatility, larger in low volatility
-        position_size = risk_per_trade / (df['atr'] * self.trailing_stop_atr / df['close'])
+        position_size = risk_per_trade / (
+            df["atr"] * self.trailing_stop_atr / df["close"]
+        )
 
         # Cap position size at reasonable limits
         position_size = position_size.clip(0.1, 2.0)
@@ -265,12 +251,14 @@ class VolatilityBreakoutStrategy(BaseStrategy):
         df = data.copy()
 
         # Calculate ATR percentile (higher = more volatile = better)
-        df['atr'] = ta.atr(df['high'], df['low'], df['close'], length=self.atr_period)
-        current_atr_percentile = (df['atr'].iloc[-1] > df['atr']).sum() / len(df['atr'])
+        df["atr"] = ta.atr(df["high"], df["low"], df["close"], length=self.atr_period)
+        current_atr_percentile = (df["atr"].iloc[-1] > df["atr"]).sum() / len(df["atr"])
 
         # Calculate price efficiency (trending vs choppy)
-        price_change = abs(df['close'].iloc[-1] - df['close'].iloc[-self.lookback_period])
-        path_length = df['close'].diff().abs().iloc[-self.lookback_period:].sum()
+        price_change = abs(
+            df["close"].iloc[-1] - df["close"].iloc[-self.lookback_period]
+        )
+        path_length = df["close"].diff().abs().iloc[-self.lookback_period :].sum()
         efficiency = price_change / path_length if path_length > 0 else 0
 
         # Combine scores
@@ -289,11 +277,11 @@ class VolatilityBreakoutStrategy(BaseStrategy):
             Dictionary of strategy parameters
         """
         return {
-            'name': self.name,
-            'lookback_period': self.lookback_period,
-            'atr_period': self.atr_period,
-            'atr_multiplier': self.atr_multiplier,
-            'volume_factor': self.volume_factor,
-            'use_volume_filter': self.use_volume_filter,
-            'trailing_stop_atr': self.trailing_stop_atr
+            "name": self.name,
+            "lookback_period": self.lookback_period,
+            "atr_period": self.atr_period,
+            "atr_multiplier": self.atr_multiplier,
+            "volume_factor": self.volume_factor,
+            "use_volume_filter": self.use_volume_filter,
+            "trailing_stop_atr": self.trailing_stop_atr,
         }

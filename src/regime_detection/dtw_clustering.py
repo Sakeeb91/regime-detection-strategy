@@ -33,7 +33,7 @@ class DTWClustering:
         n_clusters: int = 3,
         window_size: int = 20,
         metric: str = "dtw",
-        random_state: int = 42
+        random_state: int = 42,
     ):
         """
         Initialize DTW clustering detector.
@@ -58,7 +58,7 @@ class DTWClustering:
             f"window_size={window_size}"
         )
 
-    def fit(self, series: pd.Series) -> 'DTWClustering':
+    def fit(self, series: pd.Series) -> "DTWClustering":
         """
         Fit DTW clustering model.
 
@@ -81,7 +81,7 @@ class DTWClustering:
             n_clusters=self.n_clusters,
             metric=self.metric,
             random_state=self.random_state,
-            verbose=False
+            verbose=False,
         )
 
         self.model.fit(windows_scaled)
@@ -119,7 +119,7 @@ class DTWClustering:
         windows = []
 
         for i in range(len(values) - self.window_size + 1):
-            window = values[i:i + self.window_size]
+            window = values[i : i + self.window_size]
             windows.append(window)
 
         return np.array(windows).reshape(-1, self.window_size, 1)
@@ -129,7 +129,7 @@ class DTWClustering:
         extended = np.full(target_length, -1)
 
         # First window_size-1 points get label of first window
-        extended[:self.window_size-1] = labels[0]
+        extended[: self.window_size - 1] = labels[0]
 
         # Rest get labels from windows
         for i, label in enumerate(labels):
