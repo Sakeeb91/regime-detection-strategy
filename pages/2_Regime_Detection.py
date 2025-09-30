@@ -10,12 +10,12 @@ from plotly.subplots import make_subplots
 import sys
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from regime_detection.gmm_detector import GMMDetector
-from regime_detection.hmm_detector import HMMDetector
-from data.feature_engineer import FeatureEngineer
+from src.regime_detection.gmm_detector import GMMDetector
+from src.regime_detection.hmm_detector import HMMDetector
+from src.data.feature_engineer import FeatureEngineer
 
 st.set_page_config(page_title="Regime Detection", page_icon="🔍", layout="wide")
 

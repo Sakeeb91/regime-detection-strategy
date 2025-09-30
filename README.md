@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
 [![Code Style](https://img.shields.io/badge/code_style-black-000000?style=for-the-badge)](https://github.com/psf/black)
 
-<img src="outputs/plots/04_gmm_regimes.png" width="800" alt="Regime Detection Demo" />
+![Regime Detection Demo](https://raw.githubusercontent.com/Sakeeb91/regime-detection-strategy/main/outputs/plots/04_gmm_regimes.png)
 
 *Machine learning system that detects market regimes and adapts trading strategies in real-time*
 
@@ -129,30 +129,22 @@ print(stats)
 
 ---
 
-## 📸 Screenshots
+## 📸 Key Capabilities
 
-<table>
-<tr>
-<td width="50%">
-<img src="outputs/plots/01_raw_data.png" alt="Price Chart" />
-<p align="center"><b>📊 Real-Time Data Loading</b></p>
-</td>
-<td width="50%">
-<img src="outputs/plots/02_returns_analysis.png" alt="Returns Analysis" />
-<p align="center"><b>📈 Returns & Risk Analysis</b></p>
-</td>
-</tr>
-<tr>
-<td width="50%">
-<img src="outputs/plots/03_technical_indicators.png" alt="Technical Indicators" />
-<p align="center"><b>🔧 Technical Indicators</b></p>
-</td>
-<td width="50%">
-<img src="outputs/plots/04_gmm_regimes.png" alt="Regime Detection" />
-<p align="center"><b>🤖 ML Regime Detection</b></p>
-</td>
-</tr>
-</table>
+### 📊 Real-Time Market Analysis
+- Interactive price charts with volume overlay
+- Returns distribution and statistical analysis
+- 50+ technical indicators automatically calculated
+
+### 🤖 ML-Powered Regime Detection
+- Identifies Bull, Bear, Sideways, and Volatile markets
+- Color-coded regime overlays on price charts
+- Confidence metrics and transition probabilities
+
+### 💼 Strategy Performance
+- Compare multiple trading strategies
+- Comprehensive backtesting with transaction costs
+- Risk-adjusted performance metrics
 
 ---
 
@@ -393,17 +385,6 @@ MIT License - see [LICENSE](LICENSE) file
 
 ---
 
-## ⭐ Star History
-
-If you find this project useful, please consider giving it a star! ⭐
-
-<div align="center">
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Sakeeb91/regime-detection-strategy&type=Date)](https://star-history.com/#Sakeeb91/regime-detection-strategy&Date)
-
-</div>
-
----
 
 ## 🎯 Use Cases
 
@@ -499,12 +480,6 @@ No. This is educational software for research purposes only. Not financial advic
 [![Try Demo](https://img.shields.io/badge/🎮_Try_Live_Demo-blue?style=for-the-badge)](http://localhost:8502)
 [![Read Docs](https://img.shields.io/badge/📖_Read_Docs-green?style=for-the-badge)](QUICK_START.md)
 [![Deploy Now](https://img.shields.io/badge/☁️_Deploy_Now-orange?style=for-the-badge)](DEPLOYMENT_GUIDE.md)
-
----
-
-**Made with ❤️ by Sakeeb Rahman**
-
-*Turning market complexity into adaptive intelligence*
 
 ---
 

@@ -9,12 +9,12 @@ from datetime import datetime, timedelta
 import sys
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from data.data_loader import DataLoader
-from data.data_preprocessor import DataPreprocessor
-from data.feature_engineer import FeatureEngineer
+from src.data.data_loader import DataLoader
+from src.data.data_preprocessor import DataPreprocessor
+from src.data.feature_engineer import FeatureEngineer
 
 st.set_page_config(page_title="Data Explorer", page_icon="📊", layout="wide")
 

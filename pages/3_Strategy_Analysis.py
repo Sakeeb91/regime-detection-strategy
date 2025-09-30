@@ -10,14 +10,14 @@ from plotly.subplots import make_subplots
 import sys
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from strategies.trend_following import TrendFollowingStrategy
-from strategies.mean_reversion import MeanReversionStrategy
-from strategies.volatility_breakout import VolatilityBreakoutStrategy
-from strategies.strategy_selector import StrategySelector
-from utils.metrics import calculate_sharpe_ratio, calculate_max_drawdown, calculate_sortino_ratio
+from src.strategies.trend_following import TrendFollowingStrategy
+from src.strategies.mean_reversion import MeanReversionStrategy
+from src.strategies.volatility_breakout import VolatilityBreakoutStrategy
+from src.strategies.strategy_selector import StrategySelector
+from src.utils.metrics import calculate_sharpe_ratio, calculate_max_drawdown, calculate_sortino_ratio
 
 st.set_page_config(page_title="Strategy Analysis", page_icon="💼", layout="wide")
 
