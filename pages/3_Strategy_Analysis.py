@@ -90,19 +90,23 @@ if run_button or 'strategy_results' in st.session_state:
                 if "Trend Following" in strategies_to_test:
                     strategy = TrendFollowingStrategy(fast_period=tf_fast, slow_period=tf_slow)
                     signals = strategy.generate_signals(aligned_data)
-                    strategy_returns = signals['position'].shift(1) * returns
+                    # signals is a Series, use it directly as positions
+                    positions = signals if isinstance(signals, pd.Series) else signals.get('position', signals)
+                    strategy_returns = positions.shift(1) * returns
                     results['Trend Following'] = strategy_returns
 
                 if "Mean Reversion" in strategies_to_test:
                     strategy = MeanReversionStrategy(window=mr_window, threshold=mr_threshold)
                     signals = strategy.generate_signals(aligned_data)
-                    strategy_returns = signals['position'].shift(1) * returns
+                    positions = signals if isinstance(signals, pd.Series) else signals.get('position', signals)
+                    strategy_returns = positions.shift(1) * returns
                     results['Mean Reversion'] = strategy_returns
 
                 if "Volatility Breakout" in strategies_to_test:
                     strategy = VolatilityBreakoutStrategy(window=vb_window, multiplier=vb_multiplier)
                     signals = strategy.generate_signals(aligned_data)
-                    strategy_returns = signals['position'].shift(1) * returns
+                    positions = signals if isinstance(signals, pd.Series) else signals.get('position', signals)
+                    strategy_returns = positions.shift(1) * returns
                     results['Volatility Breakout'] = strategy_returns
 
                 # Regime-Adaptive strategy
@@ -119,14 +123,15 @@ if run_button or 'strategy_results' in st.session_state:
                             regime_strategy_map[regime_id] = MeanReversionStrategy(window=mr_window, threshold=mr_threshold)
 
                     # Generate adaptive signals
-                    adaptive_returns = pd.Series(0, index=returns.index)
+                    adaptive_returns = pd.Series(0.0, index=returns.index)
                     for regime_id, strategy in regime_strategy_map.items():
                         regime_mask = regimes == regime_id
                         regime_data = aligned_data[regime_mask]
                         if len(regime_data) > 0:
                             signals = strategy.generate_signals(regime_data)
-                            strategy_returns = signals['position'].shift(1) * returns[regime_mask]
-                            adaptive_returns[regime_mask] = strategy_returns
+                            positions = signals if isinstance(signals, pd.Series) else signals.get('position', signals)
+                            strategy_returns = positions.shift(1) * returns[regime_mask]
+                            adaptive_returns[regime_mask] = strategy_returns.fillna(0)
 
                     results['Regime-Adaptive'] = adaptive_returns
 
