@@ -240,13 +240,28 @@ if run_button or 'regimes' in st.session_state:
         # Convert stats to DataFrame
         stats_data = []
         for regime_id, regime_stats in stats.items():
+            # Handle both dict and Series structures
+            if isinstance(regime_stats, dict):
+                mean_ret = regime_stats['mean_return']
+                vol = regime_stats['volatility']
+                sharpe = regime_stats['sharpe_ratio']
+                freq = regime_stats['frequency']
+                dur = regime_stats['avg_duration']
+            else:
+                # If it's a Series, access by attribute
+                mean_ret = regime_stats.get('mean_return', 0)
+                vol = regime_stats.get('volatility', 0)
+                sharpe = regime_stats.get('sharpe_ratio', 0)
+                freq = regime_stats.get('frequency', 0)
+                dur = regime_stats.get('avg_duration', 0)
+
             stats_data.append({
                 'Regime': regime_labels.get(regime_id, f"Regime {regime_id}"),
-                'Avg Return': f"{regime_stats['mean_return']*100:.3f}%",
-                'Volatility': f"{regime_stats['volatility']*100:.3f}%",
-                'Sharpe Ratio': f"{regime_stats['sharpe_ratio']:.2f}",
-                'Frequency': f"{regime_stats['frequency']*100:.1f}%",
-                'Avg Duration': f"{regime_stats['avg_duration']:.1f} days"
+                'Avg Return': f"{mean_ret*100:.3f}%",
+                'Volatility': f"{vol*100:.3f}%",
+                'Sharpe Ratio': f"{sharpe:.2f}",
+                'Frequency': f"{freq*100:.1f}%",
+                'Avg Duration': f"{dur:.1f} days"
             })
 
         stats_df = pd.DataFrame(stats_data)

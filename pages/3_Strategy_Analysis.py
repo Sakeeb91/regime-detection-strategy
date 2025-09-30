@@ -96,14 +96,14 @@ if run_button or 'strategy_results' in st.session_state:
                     results['Trend Following'] = strategy_returns
 
                 if "Mean Reversion" in strategies_to_test:
-                    strategy = MeanReversionStrategy(window=mr_window, threshold=mr_threshold)
+                    strategy = MeanReversionStrategy(bb_period=mr_window, zscore_threshold=mr_threshold)
                     signals = strategy.generate_signals(aligned_data)
                     positions = signals if isinstance(signals, pd.Series) else signals.get('position', signals)
                     strategy_returns = positions.shift(1) * returns
                     results['Mean Reversion'] = strategy_returns
 
                 if "Volatility Breakout" in strategies_to_test:
-                    strategy = VolatilityBreakoutStrategy(window=vb_window, multiplier=vb_multiplier)
+                    strategy = VolatilityBreakoutStrategy(lookback_period=vb_window, atr_multiplier=vb_multiplier)
                     signals = strategy.generate_signals(aligned_data)
                     positions = signals if isinstance(signals, pd.Series) else signals.get('position', signals)
                     strategy_returns = positions.shift(1) * returns
