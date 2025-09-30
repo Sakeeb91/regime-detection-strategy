@@ -17,6 +17,7 @@ from src.data.data_loader import DataLoader
 from src.data.data_preprocessor import DataPreprocessor
 from src.data.feature_engineer import FeatureEngineer
 from src.utils.ui_components import apply_professional_styling, render_empty_state
+from src.utils.company_info import get_company_info, format_market_cap, format_employees
 
 st.set_page_config(page_title="Data Explorer", page_icon="📊", layout="wide")
 
@@ -83,11 +84,15 @@ if load_button or 'data' in st.session_state:
                 preprocessor = DataPreprocessor()
                 clean_data = preprocessor.clean_data(data)
 
+                # Fetch company information
+                company_info = get_company_info(ticker)
+
                 # Store in session state
                 st.session_state['data'] = clean_data
                 st.session_state['ticker'] = ticker
                 st.session_state['start_date'] = start_date
                 st.session_state['end_date'] = end_date
+                st.session_state['company_info'] = company_info
 
                 st.success(f"✅ Successfully loaded {len(clean_data)} days of data for {ticker}")
 
@@ -98,6 +103,80 @@ if load_button or 'data' in st.session_state:
     # Retrieve from session state
     data = st.session_state['data']
     ticker = st.session_state['ticker']
+    company_info = st.session_state.get('company_info', {})
+
+    # Company Information Card (if available)
+    if company_info and company_info.get('name') != ticker:
+        st.markdown("### 🏢 Company Information")
+
+        # Main company header
+        col_header1, col_header2 = st.columns([3, 1])
+
+        with col_header1:
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+                        border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+                <h2 style="margin: 0 0 0.5rem 0; color: #F1F5F9;">{company_info.get('name', ticker)}</h2>
+                <div style="color: #94A3B8; font-size: 0.9rem;">
+                    <strong>Ticker:</strong> {ticker} |
+                    <strong>Sector:</strong> {company_info.get('sector', 'N/A')} |
+                    <strong>Industry:</strong> {company_info.get('industry', 'N/A')}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_header2:
+            if company_info.get('market_cap'):
+                market_cap_formatted = format_market_cap(company_info['market_cap'])
+                st.metric("Market Cap", market_cap_formatted)
+
+        # Company details in columns
+        col_info1, col_info2, col_info3, col_info4 = st.columns(4)
+
+        with col_info1:
+            st.markdown(f"""
+            <div style="text-align: center; padding: 1rem; background: rgba(30, 41, 59, 0.5); border-radius: 8px;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📍</div>
+                <div style="color: #94A3B8; font-size: 0.8rem; margin-bottom: 0.25rem;">Headquarters</div>
+                <div style="font-weight: 600; color: #F1F5F9;">{company_info.get('city', 'N/A')}</div>
+                <div style="color: #94A3B8; font-size: 0.85rem;">{company_info.get('country', 'N/A')}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_info2:
+            st.markdown(f"""
+            <div style="text-align: center; padding: 1rem; background: rgba(30, 41, 59, 0.5); border-radius: 8px;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🏢</div>
+                <div style="color: #94A3B8; font-size: 0.8rem; margin-bottom: 0.25rem;">GICS Sector</div>
+                <div style="font-weight: 600; color: #F1F5F9;">{company_info.get('sector', 'N/A')}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_info3:
+            employees_formatted = format_employees(company_info.get('employees'))
+            st.markdown(f"""
+            <div style="text-align: center; padding: 1rem; background: rgba(30, 41, 59, 0.5); border-radius: 8px;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">👥</div>
+                <div style="color: #94A3B8; font-size: 0.8rem; margin-bottom: 0.25rem;">Employees</div>
+                <div style="font-weight: 600; color: #F1F5F9;">{employees_formatted}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_info4:
+            founded = company_info.get('founded', 'N/A')
+            st.markdown(f"""
+            <div style="text-align: center; padding: 1rem; background: rgba(30, 41, 59, 0.5); border-radius: 8px;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📅</div>
+                <div style="color: #94A3B8; font-size: 0.8rem; margin-bottom: 0.25rem;">Founded</div>
+                <div style="font-weight: 600; color: #F1F5F9;">{founded}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Website link if available
+        if company_info.get('website') and company_info['website'] != 'N/A':
+            st.markdown(f"🔗 [Visit Company Website]({company_info['website']})")
+
+        st.markdown("---")
 
     # Display data info
     col1, col2, col3, col4 = st.columns(4)
