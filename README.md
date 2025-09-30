@@ -4,7 +4,7 @@
 
 ### *AI-Powered Trading System with Real-Time Web Dashboard*
 
-[![Deploy](https://img.shields.io/badge/🚀_Deploy_Now-Streamlit-FF4B4B?style=for-the-badge)](https://share.streamlit.io)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Try_Now!-FF4B4B?style=for-the-badge)](https://regimedetectandstrategize.streamlit.app/)
 [![Tests](https://img.shields.io/badge/tests-45%2F45_passing-success?style=for-the-badge&logo=pytest)](https://github.com/Sakeeb91/regime-detection-strategy/actions)
 [![Python](https://img.shields.io/badge/python-3.11+-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
@@ -14,7 +14,7 @@
 
 *Machine learning system that detects market regimes and adapts trading strategies in real-time*
 
-[🚀 Quick Start](#-quick-start) · [📖 Documentation](#-documentation) · [🎯 Features](#-key-features) · [🌐 Deployment Guide](DEPLOYMENT.md)
+**[🌐 Try Live Demo](https://regimedetectandstrategize.streamlit.app/)** · [🚀 Quick Start](#-quick-start) · [📖 Documentation](#-documentation) · [🎯 Features](#-key-features) · [📦 Deploy Your Own](DEPLOYMENT.md)
 
 </div>
 
@@ -87,7 +87,17 @@
 
 ## 🚀 Quick Start
 
-### Option 1: Run Web App (Recommended)
+### Option 1: Try Live Demo (Instant!) 🌐
+
+**No installation needed** - Try it right now:
+
+👉 **[https://regimedetectandstrategize.streamlit.app/](https://regimedetectandstrategize.streamlit.app/)**
+
+Just visit the link and start analyzing any stock ticker!
+
+---
+
+### Option 2: Run Locally
 
 ```bash
 # Clone repository
