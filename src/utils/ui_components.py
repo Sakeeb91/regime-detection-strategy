@@ -75,8 +75,18 @@ def apply_professional_styling():
             transition: all 0.2s ease;
         }
 
+        .stTabs [data-baseweb="tab"]:not([aria-selected="true"]) {
+            color: #94A3B8;
+        }
+
+        .stTabs [data-baseweb="tab"]:not([aria-selected="true"]):hover {
+            color: #CBD5E1;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
         .stTabs [aria-selected="true"] {
             background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+            color: #FFFFFF !important;
         }
 
         /* Refined dataframes */
@@ -114,6 +124,40 @@ def apply_professional_styling():
         /* Slider styling */
         .stSlider [data-baseweb="slider"] {
             background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%);
+        }
+
+        .stSlider label {
+            color: #F1F5F9 !important;
+            font-weight: 600;
+        }
+
+        .stSlider [data-baseweb="slider-value"] {
+            color: #FFFFFF !important;
+        }
+
+        /* Radio buttons with better contrast */
+        .stRadio label {
+            color: #F1F5F9 !important;
+        }
+
+        .stRadio [data-baseweb="radio"] [aria-checked="true"] {
+            background-color: #6366F1 !important;
+        }
+
+        /* Checkbox styling */
+        .stCheckbox label {
+            color: #F1F5F9 !important;
+        }
+
+        /* Select boxes */
+        .stSelectbox label, .stMultiSelect label {
+            color: #F1F5F9 !important;
+            font-weight: 600;
+        }
+
+        .stSelectbox [data-baseweb="select"] span,
+        .stMultiSelect [data-baseweb="select"] span {
+            color: #F1F5F9 !important;
         }
 
         /* Select box styling */
