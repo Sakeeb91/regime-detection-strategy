@@ -116,12 +116,22 @@ if run_button or 'strategy_results' in st.session_state:
 
                     # Simple heuristic: positive return -> trend, negative -> mean reversion
                     regime_strategy_map = {}
-                    for regime_id, stats in regime_stats.items():
-                        mean_return = stats.get('mean_return', 0) if isinstance(stats, dict) else stats['mean_return']
-                        if mean_return > 0:
-                            regime_strategy_map[regime_id] = TrendFollowingStrategy(fast_period=tf_fast, slow_period=tf_slow)
-                        else:
-                            regime_strategy_map[regime_id] = MeanReversionStrategy(bb_period=mr_window, zscore_threshold=mr_threshold)
+                    if isinstance(regime_stats, pd.DataFrame):
+                        # Handle DataFrame structure
+                        for regime_id in regime_stats.index:
+                            mean_return = regime_stats.loc[regime_id, 'mean_return']
+                            if mean_return > 0:
+                                regime_strategy_map[regime_id] = TrendFollowingStrategy(fast_period=tf_fast, slow_period=tf_slow)
+                            else:
+                                regime_strategy_map[regime_id] = MeanReversionStrategy(bb_period=mr_window, zscore_threshold=mr_threshold)
+                    else:
+                        # Handle dict structure
+                        for regime_id, stats in regime_stats.items():
+                            mean_return = stats.get('mean_return', 0) if isinstance(stats, dict) else stats['mean_return']
+                            if mean_return > 0:
+                                regime_strategy_map[regime_id] = TrendFollowingStrategy(fast_period=tf_fast, slow_period=tf_slow)
+                            else:
+                                regime_strategy_map[regime_id] = MeanReversionStrategy(bb_period=mr_window, zscore_threshold=mr_threshold)
 
                     # Generate adaptive signals
                     adaptive_returns = pd.Series(0.0, index=returns.index)
