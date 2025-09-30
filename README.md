@@ -4,7 +4,7 @@
 
 ### *AI-Powered Trading System with Real-Time Web Dashboard*
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit-FF4B4B?style=for-the-badge)](http://localhost:8502)
+[![Deploy](https://img.shields.io/badge/🚀_Deploy_Now-Streamlit-FF4B4B?style=for-the-badge)](https://share.streamlit.io)
 [![Tests](https://img.shields.io/badge/tests-45%2F45_passing-success?style=for-the-badge&logo=pytest)](https://github.com/Sakeeb91/regime-detection-strategy/actions)
 [![Python](https://img.shields.io/badge/python-3.11+-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
@@ -14,7 +14,7 @@
 
 *Machine learning system that detects market regimes and adapts trading strategies in real-time*
 
-[🚀 Try Live Demo](#-quick-start) · [📖 Documentation](#-documentation) · [🎯 Features](#-key-features) · [💻 Deploy](#-deployment)
+[🚀 Quick Start](#-quick-start) · [📖 Documentation](#-documentation) · [🎯 Features](#-key-features) · [🌐 Deployment Guide](DEPLOYMENT.md)
 
 </div>
 
