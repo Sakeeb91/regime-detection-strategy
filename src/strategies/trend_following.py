@@ -7,6 +7,7 @@ using ADX and momentum indicators.
 
 from typing import Dict
 
+import numpy as np
 import pandas as pd
 from loguru import logger
 
