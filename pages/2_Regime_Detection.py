@@ -99,6 +99,12 @@ if run_button or 'regimes' in st.session_state:
                 regimes = detector.predict(regime_features)
                 probabilities = detector.predict_proba(regime_features)
 
+                # Convert regimes to pandas Series with proper index
+                regimes = pd.Series(regimes, index=regime_features.index, name='regime')
+
+                # Convert probabilities to DataFrame with proper index
+                probabilities = pd.DataFrame(probabilities, index=regime_features.index)
+
                 # Get statistics
                 returns = data['close'].pct_change().loc[regime_features.index]
                 stats = detector.get_regime_statistics(regime_features, returns=returns)
