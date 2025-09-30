@@ -121,18 +121,34 @@ def apply_professional_styling():
             font-weight: 600;
         }
 
-        /* Slider styling */
+        /* Slider styling with comprehensive selectors */
         .stSlider [data-baseweb="slider"] {
             background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%);
         }
 
-        .stSlider label {
+        /* Slider labels - all variations */
+        .stSlider label,
+        .stSlider > label,
+        .stSlider div[data-testid="stMarkdownContainer"] {
             color: #F1F5F9 !important;
-            font-weight: 600;
+            font-weight: 600 !important;
         }
 
-        .stSlider [data-baseweb="slider-value"] {
-            color: #FFFFFF !important;
+        /* Slider current value display */
+        .stSlider [data-baseweb="slider-value"],
+        .stSlider div[data-testid="stTickBar"] div {
+            color: #F1F5F9 !important;
+        }
+
+        /* Slider tick marks and numbers */
+        .stSlider [data-baseweb="slider"] [role="slider"] + div,
+        .stSlider div[data-baseweb="base-input"] {
+            color: #F1F5F9 !important;
+        }
+
+        /* Min/max labels on slider */
+        .stSlider div[data-testid="stTickBar"] {
+            color: #94A3B8 !important;
         }
 
         /* Radio buttons with better contrast */
@@ -158,6 +174,23 @@ def apply_professional_styling():
         .stSelectbox [data-baseweb="select"] span,
         .stMultiSelect [data-baseweb="select"] span {
             color: #F1F5F9 !important;
+        }
+
+        /* Text input and number input styling */
+        .stTextInput label, .stNumberInput label {
+            color: #F1F5F9 !important;
+            font-weight: 600;
+        }
+
+        .stTextInput input, .stNumberInput input {
+            color: #F1F5F9 !important;
+            background-color: rgba(30, 41, 59, 0.5) !important;
+            border-color: rgba(99, 102, 241, 0.3) !important;
+        }
+
+        .stTextInput input:focus, .stNumberInput input:focus {
+            border-color: #6366F1 !important;
+            box-shadow: 0 0 0 1px #6366F1 !important;
         }
 
         /* Select box styling */
