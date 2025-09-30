@@ -117,10 +117,11 @@ if run_button or 'strategy_results' in st.session_state:
                     # Simple heuristic: positive return -> trend, negative -> mean reversion
                     regime_strategy_map = {}
                     for regime_id, stats in regime_stats.items():
-                        if stats['mean_return'] > 0:
+                        mean_return = stats.get('mean_return', 0) if isinstance(stats, dict) else stats['mean_return']
+                        if mean_return > 0:
                             regime_strategy_map[regime_id] = TrendFollowingStrategy(fast_period=tf_fast, slow_period=tf_slow)
                         else:
-                            regime_strategy_map[regime_id] = MeanReversionStrategy(window=mr_window, threshold=mr_threshold)
+                            regime_strategy_map[regime_id] = MeanReversionStrategy(bb_period=mr_window, zscore_threshold=mr_threshold)
 
                     # Generate adaptive signals
                     adaptive_returns = pd.Series(0.0, index=returns.index)
