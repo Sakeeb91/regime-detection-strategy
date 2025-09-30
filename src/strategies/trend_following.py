@@ -5,14 +5,13 @@ Implements a dual moving average crossover strategy with trend confirmation
 using ADX and momentum indicators.
 """
 
-from typing import Dict, Optional
+from typing import Dict
 
-import numpy as np
 import pandas as pd
-import pandas_ta as ta
 from loguru import logger
 
 from .base_strategy import BaseStrategy
+from ..utils import indicators as ta
 
 
 class TrendFollowingStrategy(BaseStrategy):

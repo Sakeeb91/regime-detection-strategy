@@ -9,9 +9,10 @@ from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-import pandas_ta as ta
 from loguru import logger
 from scipy.stats import skew, kurtosis
+
+from ..utils import indicators as ta
 
 
 class FeatureEngineer:

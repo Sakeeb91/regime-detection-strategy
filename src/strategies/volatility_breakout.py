@@ -5,14 +5,13 @@ Implements ATR-based breakout detection with volume confirmation
 and dynamic position sizing.
 """
 
-from typing import Dict, Optional
+from typing import Dict
 
-import numpy as np
 import pandas as pd
-import pandas_ta as ta
 from loguru import logger
 
 from .base_strategy import BaseStrategy
+from ..utils import indicators as ta
 
 
 class VolatilityBreakoutStrategy(BaseStrategy):
