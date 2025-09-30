@@ -14,7 +14,12 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+from src.utils.ui_components import apply_professional_styling
+
 st.set_page_config(page_title="Live Dashboard", page_icon="🎯", layout="wide")
+
+# Apply professional styling
+apply_professional_styling()
 
 st.title("🎯 Live Dashboard")
 st.markdown("Real-time insights and actionable recommendations")

@@ -18,8 +18,12 @@ from src.strategies.mean_reversion import MeanReversionStrategy
 from src.strategies.volatility_breakout import VolatilityBreakoutStrategy
 from src.strategies.strategy_selector import StrategySelector
 from src.utils.metrics import calculate_sharpe_ratio, calculate_max_drawdown, calculate_sortino_ratio
+from src.utils.ui_components import apply_professional_styling
 
 st.set_page_config(page_title="Strategy Analysis", page_icon="💼", layout="wide")
+
+# Apply professional styling
+apply_professional_styling()
 
 st.title("💼 Strategy Performance Analysis")
 st.markdown("Compare trading strategies and analyze regime-adaptive performance")

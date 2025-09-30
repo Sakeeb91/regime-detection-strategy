@@ -16,8 +16,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.regime_detection.gmm_detector import GMMDetector
 from src.regime_detection.hmm_detector import HMMDetector
 from src.data.feature_engineer import FeatureEngineer
+from src.utils.ui_components import apply_professional_styling
 
 st.set_page_config(page_title="Regime Detection", page_icon="🔍", layout="wide")
+
+# Apply professional styling
+apply_professional_styling()
 
 st.title("🔍 Regime Detection")
 st.markdown("Identify market regimes using machine learning")

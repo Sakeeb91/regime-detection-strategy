@@ -4,6 +4,7 @@ Page 1: Data Explorer - Load and visualize market data
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import sys
@@ -15,8 +16,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.data.data_loader import DataLoader
 from src.data.data_preprocessor import DataPreprocessor
 from src.data.feature_engineer import FeatureEngineer
+from src.utils.ui_components import apply_professional_styling, render_empty_state
 
 st.set_page_config(page_title="Data Explorer", page_icon="📊", layout="wide")
+
+# Apply professional styling
+apply_professional_styling()
 
 st.title("📊 Data Explorer")
 st.markdown("Load and analyze market data from Yahoo Finance")
