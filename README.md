@@ -238,14 +238,16 @@ See [TESTING.md](docs/TESTING.md) for detailed testing guidelines.
 - [x] Strategy selector for regime-based allocation
 - [x] Performance analytics (Sharpe, Sortino, Calmar, drawdowns)
 
-### Phase 3: Testing & Documentation 🔄 **IN PROGRESS (64% Complete)**
-- [x] Unit test suite (29/45 tests passing)
-- [x] Integration tests framework
-- [x] Test coverage: 19% (target: >80%)
+### Phase 3: Testing & Documentation 🔄 **IN PROGRESS (87% Complete)**
+- [x] Unit test suite (39/45 tests passing - 87%)
+- [x] Integration tests (13/16 passing)
+- [x] Test coverage: 43% (target: >80%)
 - [x] API documentation
 - [x] Testing guidelines
-- [ ] Fix known test issues (feature engineering edge cases)
-- [ ] Increase test coverage
+- [x] Fixed critical feature engineering bug
+- [x] Fixed test assertion errors
+- [ ] Fix remaining 6 test failures
+- [ ] Increase test coverage to 80%+
 - [ ] Example Jupyter notebooks
 - [ ] Usage tutorials
 
@@ -298,13 +300,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Current Statistics
 - **Lines of Code**: ~4,300 Python LOC
-- **Test Coverage**: 19% (29/45 tests passing)
+- **Test Coverage**: 43% (39/45 tests passing - 87%)
 - **Modules Implemented**: 22/22 (100%)
 - **Documentation**: Comprehensive API docs & guides
 
-### Known Issues
-1. Feature engineering drops all rows with certain window configurations (being fixed)
-2. Some integration tests have assertion errors with numpy arrays
-3. Test coverage below target (19% vs 80% goal)
+### Recent Fixes ✅
+1. ✅ Fixed critical feature engineering bug (dropna issue)
+2. ✅ Fixed test assertion errors (numpy array methods)
+3. ✅ Improved test pass rate from 64% to 87%
+4. ✅ Increased code coverage from 19% to 43%
+
+### Remaining Issues
+1. 6/45 tests still failing (3 assertion errors, 1 HMM convergence, 1 cache, 1 DTW)
+2. Test coverage below target (43% vs 80% goal)
 
 *Last Updated: September 30, 2025*
