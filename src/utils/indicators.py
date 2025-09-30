@@ -159,3 +159,41 @@ def obv(close: pd.Series, volume: pd.Series) -> pd.Series:
     """Calculate On-Balance Volume."""
     obv_values = (np.sign(close.diff()) * volume).fillna(0).cumsum()
     return obv_values
+
+
+def vwap(
+    high: pd.Series, low: pd.Series, close: pd.Series, volume: pd.Series
+) -> pd.Series:
+    """Calculate Volume Weighted Average Price."""
+    typical_price = (high + low + close) / 3
+    vwap_values = (typical_price * volume).cumsum() / volume.cumsum()
+    return vwap_values
+
+
+def mfi(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    volume: pd.Series,
+    length: int = 14,
+) -> pd.Series:
+    """Calculate Money Flow Index."""
+    typical_price = (high + low + close) / 3
+    money_flow = typical_price * volume
+
+    positive_flow = money_flow.where(typical_price > typical_price.shift(1), 0)
+    negative_flow = money_flow.where(typical_price < typical_price.shift(1), 0)
+
+    positive_mf = positive_flow.rolling(window=length).sum()
+    negative_mf = negative_flow.rolling(window=length).sum()
+
+    mfr = positive_mf / negative_mf
+    mfi_values = 100 - (100 / (1 + mfr))
+
+    return mfi_values
+
+
+def pvt(close: pd.Series, volume: pd.Series) -> pd.Series:
+    """Calculate Price Volume Trend."""
+    pvt_values = (volume * (close.pct_change())).cumsum()
+    return pvt_values
