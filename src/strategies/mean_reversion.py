@@ -203,7 +203,7 @@ class MeanReversionStrategy(BaseStrategy):
 
         # Calculate ADX (lower ADX = weaker trend = better for mean reversion)
         adx_result = ta.adx(df["high"], df["low"], df["close"], length=14)
-        current_adx = adx_result[f"ADX_14"].iloc[-1] if len(df) > 14 else 50
+        current_adx = adx_result["ADX_14"].iloc[-1] if len(df) > 14 else 50
 
         # Calculate BB width percentile (narrower = better for mean reversion)
         bb_result = ta.bbands(df["close"], length=self.bb_period, std=self.bb_std)

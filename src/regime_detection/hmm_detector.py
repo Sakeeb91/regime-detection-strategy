@@ -5,7 +5,7 @@ Uses HMM to model market regimes as hidden states with transition
 probabilities, allowing for temporal regime dynamics.
 """
 
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd

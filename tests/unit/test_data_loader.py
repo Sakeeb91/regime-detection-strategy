@@ -5,7 +5,6 @@ Unit tests for DataLoader module.
 import os
 import pytest
 import pandas as pd
-from datetime import datetime
 from src.data.data_loader import DataLoader
 
 

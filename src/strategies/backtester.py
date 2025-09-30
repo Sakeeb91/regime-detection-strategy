@@ -5,7 +5,7 @@ Provides comprehensive backtesting capabilities with transaction costs,
 slippage modeling, and detailed performance analytics.
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd

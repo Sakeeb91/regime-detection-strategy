@@ -5,14 +5,12 @@ Creates comprehensive HTML and text reports with strategy performance,
 regime analysis, and risk metrics.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 from datetime import datetime
 import pandas as pd
 import numpy as np
 from pathlib import Path
 from loguru import logger
-
-from .metrics import PerformanceMetrics
 
 
 class PerformanceReporter:
@@ -171,7 +169,7 @@ class PerformanceReporter:
 
     def _generate_risk_section(self, results: Dict) -> Dict:
         """Generate risk metrics section."""
-        equity_curve = results["equity_curve"]
+        results["equity_curve"]
         returns = results["returns"]
 
         # Calculate additional risk metrics
@@ -341,11 +339,16 @@ class PerformanceReporter:
 <head>
     <title>{report['metadata']['strategy_name']} - Performance Report</title>
     <style>
-        body {{ font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }}
-        .container {{ max-width: 1200px; margin: 0 auto; background-color: white; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }}
+        body {{ font-family: Arial, sans-serif; margin: 20px;
+                background-color: #f5f5f5; }}
+        .container {{ max-width: 1200px; margin: 0 auto; background-color: white;
+                      padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }}
         h1 {{ color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }}
-        h2 {{ color: #555; margin-top: 30px; border-bottom: 2px solid #ddd; padding-bottom: 5px; }}
-        .metric {{ display: inline-block; width: 30%; margin: 10px 1%; padding: 15px; background-color: #f9f9f9; border-left: 4px solid #4CAF50; }}
+        h2 {{ color: #555; margin-top: 30px; border-bottom: 2px solid #ddd;
+              padding-bottom: 5px; }}
+        .metric {{ display: inline-block; width: 30%; margin: 10px 1%;
+                   padding: 15px; background-color: #f9f9f9;
+                   border-left: 4px solid #4CAF50; }}
         .metric-label {{ font-size: 12px; color: #777; }}
         .metric-value {{ font-size: 24px; font-weight: bold; color: #333; }}
         .positive {{ color: #4CAF50; }}

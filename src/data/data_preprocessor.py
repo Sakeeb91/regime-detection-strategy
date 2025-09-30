@@ -4,7 +4,7 @@ Data preprocessing module for cleaning and transforming market data.
 Handles missing data, outliers, resampling, and data validation.
 """
 
-from typing import Optional, Tuple
+from typing import Tuple
 
 import numpy as np
 import pandas as pd

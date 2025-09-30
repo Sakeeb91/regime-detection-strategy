@@ -5,12 +5,9 @@ Uses DTW distance metric with K-means clustering to identify
 similar market patterns across time.
 """
 
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 from loguru import logger
-from sklearn.preprocessing import StandardScaler
 from tslearn.clustering import TimeSeriesKMeans
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 

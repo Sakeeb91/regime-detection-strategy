@@ -3,7 +3,6 @@ Base strategy class for all trading strategies.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
 
 import pandas as pd
 
@@ -35,7 +34,6 @@ class BaseStrategy(ABC):
         Returns:
             Series with signals (1: long, -1: short, 0: neutral)
         """
-        pass
 
     def get_positions(self, signals: pd.Series) -> pd.Series:
         """

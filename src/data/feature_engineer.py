@@ -99,8 +99,9 @@ class FeatureEngineer:
         # Drop NaN values at the beginning
         initial_rows = len(df)
         df = df.dropna()
+        dropped = initial_rows - len(df)
         logger.info(
-            f"Created features: {len(df.columns)} columns, dropped {initial_rows - len(df)} rows with NaN"
+            f"Created features: {len(df.columns)} columns, dropped {dropped} rows"
         )
 
         return df

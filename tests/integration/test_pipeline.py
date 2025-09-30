@@ -8,7 +8,6 @@ data flow through the system.
 import pytest
 import pandas as pd
 import numpy as np
-from datetime import datetime
 
 from src.data.data_preprocessor import DataPreprocessor
 from src.data.feature_engineer import FeatureEngineer
@@ -367,7 +366,7 @@ class TestCrossModuleCompatibility:
 
         for detector in detectors:
             detector.fit(regime_features)
-            regimes = detector.predict(regime_features)
+            detector.predict(regime_features)
 
             for strategy in strategies:
                 # Should work without errors
