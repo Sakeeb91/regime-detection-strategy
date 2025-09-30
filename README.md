@@ -395,6 +395,18 @@ MIT License - see [LICENSE](LICENSE) file
 
 ---
 
+## 🤝 Contributors
+
+<div align="center">
+
+Special thanks to **Mohin Hasin Rabbi** for contributions to this project.
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/mohin-io/)
+
+</div>
+
+---
+
 
 ## 🎯 Use Cases
 
