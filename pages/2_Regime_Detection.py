@@ -240,15 +240,29 @@ if run_button or 'regimes' in st.session_state:
         # Convert stats to DataFrame - handle both dict and DataFrame
         stats_data = []
         if isinstance(stats, pd.DataFrame):
-            # Stats is already a DataFrame
+            # Stats is already a DataFrame - use correct column names from gmm_detector.py
             for regime_id in stats.index:
+                # Use correct column names: sharpe (not sharpe_ratio), percentage (not frequency), mean_duration (not avg_duration)
+                mean_ret = stats.loc[regime_id, 'mean_return'] if 'mean_return' in stats.columns else 0
+                std_ret = stats.loc[regime_id, 'std_return'] if 'std_return' in stats.columns else 0
+                sharpe = stats.loc[regime_id, 'sharpe'] if 'sharpe' in stats.columns else 0
+                percentage = stats.loc[regime_id, 'percentage'] if 'percentage' in stats.columns else 0
+                mean_dur = stats.loc[regime_id, 'mean_duration'] if 'mean_duration' in stats.columns else 0
+
+                # Handle NaN and inf values
+                mean_ret = 0 if pd.isna(mean_ret) or np.isinf(mean_ret) else mean_ret
+                std_ret = 0 if pd.isna(std_ret) or np.isinf(std_ret) else std_ret
+                sharpe = 0 if pd.isna(sharpe) or np.isinf(sharpe) else sharpe
+                percentage = 0 if pd.isna(percentage) or np.isinf(percentage) else percentage
+                mean_dur = 0 if pd.isna(mean_dur) or np.isinf(mean_dur) else mean_dur
+
                 stats_data.append({
                     'Regime': regime_labels.get(regime_id, f"Regime {regime_id}"),
-                    'Avg Return': f"{stats.loc[regime_id, 'mean_return']*100:.3f}%",
-                    'Volatility': f"{stats.loc[regime_id, 'std_return']*100:.3f}%",
-                    'Sharpe Ratio': f"{stats.loc[regime_id, 'sharpe_ratio']:.2f}",
-                    'Frequency': f"{stats.loc[regime_id, 'frequency']*100:.1f}%",
-                    'Avg Duration': f"{stats.loc[regime_id, 'avg_duration']:.1f} days"
+                    'Avg Return': f"{mean_ret*100:.3f}%",
+                    'Volatility': f"{std_ret*100:.3f}%",
+                    'Sharpe Ratio': f"{sharpe:.2f}",
+                    'Frequency': f"{percentage:.1f}%",
+                    'Avg Duration': f"{mean_dur:.1f} days"
                 })
         else:
             # Stats is a dict
@@ -286,9 +300,12 @@ if run_button or 'regimes' in st.session_state:
             fig_returns = go.Figure()
             if isinstance(stats, pd.DataFrame):
                 for regime_id in stats.index:
+                    mean_ret = stats.loc[regime_id, 'mean_return'] if 'mean_return' in stats.columns else 0
+                    # Handle NaN and inf
+                    mean_ret = 0 if pd.isna(mean_ret) or np.isinf(mean_ret) else mean_ret
                     fig_returns.add_trace(go.Bar(
                         x=[regime_labels.get(regime_id, f"Regime {regime_id}")],
-                        y=[stats.loc[regime_id, 'mean_return']*100],
+                        y=[mean_ret*100],
                         name=regime_labels.get(regime_id, f"Regime {regime_id}"),
                         marker_color=colors[regime_id % len(colors)].replace('0.3', '0.8')
                     ))
@@ -313,7 +330,12 @@ if run_button or 'regimes' in st.session_state:
         with col2:
             # Regime frequency
             if isinstance(stats, pd.DataFrame):
-                freq_values = [stats.loc[i, 'frequency'] for i in range(n_regimes)]
+                # Use 'percentage' column, not 'frequency' - handle NaN/inf
+                freq_values = []
+                for i in range(n_regimes):
+                    val = stats.loc[i, 'percentage'] if 'percentage' in stats.columns else 0
+                    val = 0 if pd.isna(val) or np.isinf(val) else val
+                    freq_values.append(val)
             else:
                 freq_values = [stats[i]['frequency'] for i in range(n_regimes)]
 

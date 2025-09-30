@@ -117,9 +117,9 @@ if run_button or 'strategy_results' in st.session_state:
                     # Simple heuristic: positive return -> trend, negative -> mean reversion
                     regime_strategy_map = {}
                     if isinstance(regime_stats, pd.DataFrame):
-                        # Handle DataFrame structure
+                        # Handle DataFrame structure - use safe column access
                         for regime_id in regime_stats.index:
-                            mean_return = regime_stats.loc[regime_id, 'mean_return']
+                            mean_return = regime_stats.loc[regime_id, 'mean_return'] if 'mean_return' in regime_stats.columns else 0
                             if mean_return > 0:
                                 regime_strategy_map[regime_id] = TrendFollowingStrategy(fast_period=tf_fast, slow_period=tf_slow)
                             else:

@@ -303,9 +303,18 @@ action_items = []
 # Generate action items based on signals
 if has_regimes:
     regime_stats = st.session_state.get('regime_stats', {})
-    current_regime_stats = regime_stats.get(current_regime, {})
 
-    if current_regime_stats.get('mean_return', 0) > 0:
+    # Handle both DataFrame and dict structures
+    if isinstance(regime_stats, pd.DataFrame):
+        if current_regime in regime_stats.index and 'mean_return' in regime_stats.columns:
+            mean_return = regime_stats.loc[current_regime, 'mean_return']
+        else:
+            mean_return = 0
+    else:
+        current_regime_stats = regime_stats.get(current_regime, {})
+        mean_return = current_regime_stats.get('mean_return', 0)
+
+    if mean_return > 0:
         action_items.append("✅ Current regime is historically profitable - consider maintaining/increasing exposure")
     else:
         action_items.append("⚠️ Current regime shows negative historical returns - consider reducing exposure")
